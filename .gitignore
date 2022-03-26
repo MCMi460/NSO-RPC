@@ -1,0 +1,9 @@
+# API
+api/private.py
+
+# Python
+venv/
+__pycache__/
+
+# MacOS
+.DS_Store
