@@ -11,7 +11,7 @@ class Discord():
     def __init__(self):
         self.rpc = pypresence.Presence('637692124539650048')
         self.connect()
-        self.update()
+        self.api = API(session_token)
 
     def connect(self):
         fails = 0
@@ -28,7 +28,7 @@ class Discord():
                 continue
 
     def update(self):
-        self.api = API(session_token)
+        self.api.updateLogin()
         self.nickname = self.api.userInfo['nickname']
         self.user = User(self.api.login.account['result'].get('user'))
 
@@ -39,17 +39,18 @@ class Discord():
             self.rpc.clear()
 
     def background(self):
+        time.sleep(5)
         while True:
-            time.sleep(60)
             self.update()
-
-if not os.path.isfile('./private.txt'):
-    session = Session()
-    session_token = session.run(*session.login())
-else:
-    with open('./private.txt', 'r') as file:
-        session_token = json.loads(file.read())['session_token']
+            time.sleep(60)
 
 if __name__ == '__main__':
+    if not os.path.isfile('./private.txt'):
+        session = Session()
+        session_token = session.run(*session.login())
+    else:
+        with open('./private.txt', 'r') as file:
+            session_token = json.loads(file.read())['session_token']
+    
     client = Discord()
     client.background()

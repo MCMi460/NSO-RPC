@@ -43,6 +43,10 @@ class API():
     def makeRequest(self, route):
         return requests.post(self.url + route, headers = self.headers)
 
+    def updateLogin(self):
+        self.login = Login(self.userInfo, self.accessToken, self.guid)
+        self.login.loginToAccount()
+
 class Nintendo():
     def __init__(self, sessionToken):
         self.headers = {
