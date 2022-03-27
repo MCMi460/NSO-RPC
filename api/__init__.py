@@ -173,17 +173,32 @@ class FriendList(API):
         arr = json.loads(response.text)['result']['friends']
         self.friendList = [ Friend(friend) for friend in arr ]
 
-class Friend():
+class User():
     def __init__(self, f):
         self.id = f.get('id')
         self.nsaId = f.get('nsaId')
         self.imageUri = f.get('imageUri')
         self.name = f.get('name')
+        self.supportId = f.get('supportId')
+        self.isChildRestricted = f.get('isChildRestricted')
+        self.etag = f.get('etag')
+        self.links = f.get('links')
+        self.permissions = f.get('permissions')
+        self.presence = Presence(f.get('presence'))
+
+    def description(self):
+        return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
+        + '   - Profile Picture: %s\n' % self.imageUri
+        + '   - Status: %s\n' % self.presence.description()
+        )
+
+class Friend(User):
+    def __init__(self, f):
+        super().__init__(f)
         self.isFriend = f.get('isFriend')
         self.isFavoriteFriend = f.get('isFavoriteFriend')
         self.isServiceUser = f.get('isServiceUser')
         self.friendCreatedAt = f.get('friendCreatedAt')
-        self.presence = Presence(f.get('presence'))
 
     def description(self):
         return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)

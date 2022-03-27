@@ -8,7 +8,8 @@ This README will be split into two sections:
 
 This project runs off of the Nintendo Switch Online Mobile App API.  
 I'd like to thank the [NintendoSwitchRESTAPI](https://github.com/ZekeSnider/NintendoSwitchRESTAPI) developer(s) for very useful blueprint designs.  
-And especially, I'd like to thank [frozenpandaman](https://github.com/frozenpandaman) and his [s2s](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs) API
+And especially, I'd like to thank [frozenpandaman](https://github.com/frozenpandaman) and his [s2s](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs) API  
+Also, [blackgear](https://github.com/blackgear)'s [NSOnline_API](https://github.com/blackgear/NSOnline_API) was integral to my understanding of `session_token` authentication.
 
 <h1 id = 'quick'>Quickstart Guide</h1>
 
