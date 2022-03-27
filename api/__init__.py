@@ -33,9 +33,10 @@ class API():
 
         self.userInfo = UsersMe(self.accessToken).get()
 
-        self.login = Login(self.userInfo, self.accessToken, self.guid)
-        self.login.loginToAccount()
-        with open('./private.txt', 'w') as file:
+        path = os.path.expanduser('~/Documents/NSO-RPC')
+        if not os.path.isdir(path):
+            os.mkdir(path)
+        with open(os.path.join(path, 'private.txt'), 'w') as file:
             file.write(json.dumps({
                 'session_token': session_token,
             }))
@@ -248,7 +249,7 @@ class Session():
         }
         self.Session = requests.Session()
 
-    def login(self):
+    def login(self, receiveInput):
         state = base64.urlsafe_b64encode(os.urandom(36))
         verify = base64.urlsafe_b64encode(os.urandom(32))
         authHash = hashlib.sha256()
@@ -270,11 +271,14 @@ class Session():
 
         webbrowser.open(response.history[0].url)
         tokenPattern = re.compile(r'(eyJhbGciOiJIUzI1NiJ9\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*)')
-        code = tokenPattern.findall(input('After logging in, please copy the link from \'Select this account\' and enter it here:\n'))[0]
+        code = tokenPattern.findall(receiveInput())[0]
 
         url = 'https://accounts.nintendo.com/connect/1.0.0/api/session_token'
 
         return code, verify
+
+    def inputManually(self):
+        return input('After logging in, please copy the link from \'Select this account\' and enter it here:\n')
 
     def run(self, code, verify):
         url = 'https://accounts.nintendo.com/connect/1.0.0/api/session_token'
