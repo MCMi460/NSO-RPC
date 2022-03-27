@@ -14,13 +14,38 @@ if os.path.isfile(path):
         session_token = json.loads(file.read())['session_token']
 client = Discord(session_token)
 # PyQt5 Variables
+style = """
+QWidget {
+  background-color: #F2F2F2;
+}
+QGroupBox {
+  background-color: #fff;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+}
+QLineEdit {
+  color: #888c94;
+  background-color: #F2F2F2;
+}
+QLabel {
+  background-color: #F2F2F2;
+  color: #3c3c3c;
+  text-align: center;
+}
+QPushButton {
+  color: #fff;
+  background-color: #e60012;
+  border-radius: 10px;
+  text-align: center;
+}
+"""
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
         self.MainWindow = MainWindow
 
     def selfService(self):
-        self.MainWindow.setStyleSheet(open('./layout/layout.css', 'r').read())
+        self.MainWindow.setStyleSheet(style)
         self.assignVariables()
 
         self.MainWindow.closeEvent = self.closeEvent
