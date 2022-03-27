@@ -39,7 +39,10 @@ class Discord():
 
         presence = self.user.presence
         if presence.state != 'INACTIVE':
-            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5))
+            state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+            if presence.game.totalPlayTime / 60 < 5:
+                state = 'Played for a little while'
+            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
         else:
             self.rpc.clear()
 
