@@ -5,5 +5,10 @@ private.*
 venv/
 __pycache__/
 
+# Compilation
+build/
+dist/
+setup.py
+
 # MacOS
 .DS_Store

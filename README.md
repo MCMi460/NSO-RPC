@@ -46,6 +46,15 @@ For Windows, run
 cd client
 python -m pip install -r requirements.txt pyinstaller
 pyinstaller --onefile --clean --noconsole --add-data "icon.png;." --icon=icon.ico app.py
+start dist
+```
+For MacOS, run
+```sh
+cd client
+python3 -m pip install -r requirements.txt py2app
+py2applet --make-setup app.py icon.icns "icon.png"
+python3 setup.py py2app
+open dist
 ```
 
 ## Understanding
