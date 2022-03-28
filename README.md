@@ -253,7 +253,10 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
       while True:
         if self.running:
           if second == 60:
-            self.update()
+            try:
+              self.update()
+            except KeyError:
+              pass
             second = 0
           second += 1
         else:
@@ -297,9 +300,15 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     - `API().updateLogin()`:
 
-      All this does is create/refresh your `Login()`. See `Login()` for more information.
+      All this does is create/refresh your `Login()` - and checks to see if your `s2sHash` is older than 2 minutes.  
+      See `Login()` for more information.
       ```python
-      self.login = Login(self.userInfo, self.accessToken, self.guid)
+      if time.time() - self.s2sHash['time'] >= 120:
+        self.s2sHash = {
+          'hash': None,
+          'time': time.time(),
+        }
+      self.login = Login(self.userInfo, self.accessToken, self.guid, self.s2sHash['hash'])
       self.login.loginToAccount()
       ```
 
@@ -329,13 +338,15 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
   - `Login()`:
 
-    Takes `userInfo, accessToken, guid`.  
-    Sets headers, URL, GUID, user's info, `accessToken`, `Flapg()` API, and the user's account.
+    - `Login().__init__()`:
 
-    Please take extreme caution and note of this piece of code.
-    ```python
-    self.flapg = Flapg(self.accessToken, self.timestamp, self.guid).get()
-    ```
+      Takes `userInfo, accessToken, guid, s2sHash`.  
+      Sets headers, URL, GUID, user's info, `accessToken`, `Flapg()` API, and the user's account.
+
+      Please take extreme caution and note of this piece of code.
+      ```python
+      self.flapg = Flapg(self.accessToken, self.timestamp, self.guid, s2sHash).get()
+      ```
 
     - `Login().loginToAccount()`:
 
@@ -367,15 +378,19 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     - `Flapg().__init__()`:
 
-      Takes `id_token, timestamp, guid`.
+      Takes `id_token, timestamp, guid, s2sHash`.
       ```python
+      if s2sHash:
+        hash = s2sHash
+      else:
+        hash = s2s(id_token, timestamp).getHash()
       self.headers = {
-      'x-token': id_token,
-      'x-time': str(timestamp),
-      'x-guid': guid,
-      'x-hash': s2s(id_token, timestamp).getHash(),
-      'x-ver': '3',
-      'x-iid': 'nso',
+        'x-token': id_token,
+        'x-time': str(timestamp),
+        'x-guid': guid,
+        'x-hash': hash,
+        'x-ver': '3',
+        'x-iid': 'nso',
       }
 
       self.url = 'https://flapg.com'

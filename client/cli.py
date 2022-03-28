@@ -50,7 +50,10 @@ class Discord():
         while True:
             if self.running:
                 if second == 60:
-                    self.update()
+                    try:
+                        self.update()
+                    except KeyError:
+                        pass
                     second = 0
                 second += 1
             else:

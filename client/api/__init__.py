@@ -32,6 +32,10 @@ class API():
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
 
         self.userInfo = UsersMe(self.accessToken).get()
+        self.s2sHash = {
+            'hash': None,
+            'time': time.time(),
+        }
 
         path = os.path.expanduser('~/Documents/NSO-RPC')
         if not os.path.isdir(path):
@@ -45,7 +49,12 @@ class API():
         return requests.post(self.url + route, headers = self.headers)
 
     def updateLogin(self):
-        self.login = Login(self.userInfo, self.accessToken, self.guid)
+        if time.time() - self.s2sHash['time'] >= 120:
+            self.s2sHash = {
+                'hash': None,
+                'time': time.time(),
+            }
+        self.login = Login(self.userInfo, self.accessToken, self.guid, self.s2sHash['hash'])
         self.login.loginToAccount()
 
 class Nintendo():
@@ -104,12 +113,16 @@ class s2s():
         return json.loads(response.text)['hash']
 
 class Flapg():
-    def __init__(self, id_token, timestamp, guid):
+    def __init__(self, id_token, timestamp, guid, s2sHash = None):
+        if s2sHash:
+            hash = s2sHash
+        else:
+            hash = s2s(id_token, timestamp).getHash()
         self.headers = {
             'x-token': id_token,
             'x-time': str(timestamp),
             'x-guid': guid,
-            'x-hash': s2s(id_token, timestamp).getHash(),
+            'x-hash': hash,
             'x-ver': '3',
             'x-iid': 'nso',
         }
@@ -123,7 +136,7 @@ class Flapg():
         return json.loads(response.text)['result']
 
 class Login():
-    def __init__(self, userInfo, accessToken, guid):
+    def __init__(self, userInfo, accessToken, guid, s2sHash = None):
         self.headers = {
             'Host': 'api-lp1.znc.srv.nintendo.net',
             'Accept-Language': 'en-US',
@@ -144,7 +157,7 @@ class Login():
         self.userInfo = userInfo
         self.accessToken = accessToken
 
-        self.flapg = Flapg(self.accessToken, self.timestamp, self.guid).get()
+        self.flapg = Flapg(self.accessToken, self.timestamp, self.guid, s2sHash).get()
 
         self.account = None
 
@@ -272,8 +285,6 @@ class Session():
         webbrowser.open(response.history[0].url)
         tokenPattern = re.compile(r'(eyJhbGciOiJIUzI1NiJ9\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*)')
         code = tokenPattern.findall(receiveInput())[0]
-
-        url = 'https://accounts.nintendo.com/connect/1.0.0/api/session_token'
 
         return code, verify
 
