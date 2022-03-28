@@ -45,7 +45,10 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 **A:** Yes, Discord needs to be open for this application to even run in the first place.
 
 ***Q: I can't get the program to run, what's wrong with it?!***  
-**A:** Please make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
+**A:** Run the [cli.py][cli] program and get the error data, then make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
+
+***Q: I want to switch Nintendo Accounts/I can't link my Nintendo Account. What do I do?***  
+**A:** First, try and delete the NSO-RPC folder in your Documents folder. If it still doesn't work, then refer to the question above.
 
 *I am not liable for any sort of rate limiting Nintendo may hammer upon your network*
 
@@ -227,7 +230,8 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     This updates the user's Discord Rich Presence. Will error if an `API()` object is not defined at `Discord().api`  
     It basically just calls the API to login to your account, grab the user's info, then if they are not currently offline, it will update the `Discord().rpc`.  
-    If they are offline, then it will clear their status.
+    If they are offline, then it will clear their status.  
+    If a `Game().sysDescription` is available, it will display that as the Discord state instead of hours played.
     ```python
     def update(self):
       self.api.updateLogin()
@@ -236,9 +240,11 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
       presence = self.user.presence
       if presence.state != 'INACTIVE':
-        state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
-        if presence.game.totalPlayTime / 60 < 5:
-          state = 'Played for a little while'
+        state = presence.game.sysDescription
+        if not state:
+          state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+          if presence.game.totalPlayTime / 60 < 5:
+            state = 'Played for a little while'
         self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
       else:
         self.rpc.clear()
