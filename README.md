@@ -29,12 +29,23 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 ## FAQ
 
 ***Q: Do you need a Nintendo Switch Online subscription to use this app?***  
-**A:** No, you do not. This app works whether or not you have access to online services.
+**A:** No, you do not. This app works whether or not you have access to online services. You will, however, need to link your Nintendo account to your user profile on your Switch.
 
 ***Q: My computer says that this app might have a virus! Does it?***  
-**A:** No. Your computer is saying that because it's a foreign executable file downloaded from the internet, so you should always be cautious about it. If you'd like, you can [build your own `exe`](#depth).
+**A:** No. Your computer is saying that because it's a foreign executable file downloaded from the internet, so you should always be cautious about it. If you'd like, you can [build your own `exe`](#building).
 
 ***Q: You're not stealing my account, are you?***  
 **A:** Not me, personally. You'll have to ask [frozenpandaman (s2s)](https://github.com/frozenpandaman) and [@NexusMine (flapg)](https://twitter.com/NexusMine).
 
 <h1 id = 'depth'>In-depth guide</h1>
+
+<h2 id = 'building'>Building</h2>
+
+For Windows, run
+```bat
+cd client
+python -m pip install -r requirements.txt pyinstaller
+pyinstaller --onefile --clean --noconsole --add-data "icon.png;." --icon=icon.ico app.py
+```
+
+## Understanding

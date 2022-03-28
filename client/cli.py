@@ -4,7 +4,6 @@ import sys
 import os
 import time
 import pypresence
-sys.path.insert(1, '../')
 from api import *
 
 class Discord():

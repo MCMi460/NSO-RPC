@@ -39,6 +39,13 @@ QPushButton {
   text-align: center;
 }
 """
+def getPath(path):
+    try:
+        root = sys._MEIPASS
+    except Exception:
+        root = os.path.abspath('.')
+
+    return os.path.join(root, path)
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
@@ -116,7 +123,7 @@ if __name__ == '__main__':
     MainWindow = QMainWindow()
     window = GUI(MainWindow)
 
-    tray = SystemTrayApp(QIcon('icon.png'), MainWindow)
+    tray = SystemTrayApp(QIcon(getPath('icon.png')), MainWindow)
     window.setupUi(MainWindow)
     window.selfService()
 
