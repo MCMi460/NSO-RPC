@@ -12,15 +12,20 @@ import hashlib
 import re
 
 client_id = '71b963c1b7b6d119'
-version = 0.1
+version = 0.2
 nsoAppVersion = '2.0.0'
 
 class API():
     def __init__(self, session_token):
         self.headers = {
-            'Accept': 'application/json',
-            'Accept-Encoding': 'gzip',
+            'X-ProductVersion': '2.0.0',
+            'X-Platform': 'iOS',
             'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8',
+            'Host': 'api-lp1.znc.srv.nintendo.net',
+            'Connection': 'Keep-Alive',
+            'Accept-Encoding': 'gzip',
         }
 
         self.tokenResponse = Nintendo(session_token).getServiceToken()
@@ -28,13 +33,12 @@ class API():
         self.accessToken = self.tokenResponse['access_token']
         self.guid = str(uuid.uuid4())
 
-        self.headers['Authorization'] = 'Bearer %s' % self.accessToken # Add authorization token
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
 
         self.userInfo = UsersMe(self.accessToken).get()
-        self.s2sHash = {
-            'hash': None,
-            'time': time.time(),
+        self.login = {
+            'login': None,
+            'time': 0,
         }
 
         path = os.path.expanduser('~/Documents/NSO-RPC')
@@ -49,13 +53,19 @@ class API():
         return requests.post(self.url + route, headers = self.headers)
 
     def updateLogin(self):
-        if time.time() - self.s2sHash['time'] >= 120:
-            self.s2sHash = {
-                'hash': None,
-                'time': time.time(),
-            }
-        self.login = Login(self.userInfo, self.accessToken, self.guid, self.s2sHash['hash'])
-        self.login.loginToAccount()
+        login = Login(self.userInfo, self.accessToken, self.guid)
+        login.loginToAccount()
+        self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
+        self.login = {
+            'login': login,
+            'time': time.time(),
+        }
+
+    def getSelf(self):
+        self.route = '/v3/User/ShowSelf'
+
+        response = self.makeRequest(self.route)
+        self.user = User(json.loads(response.text)['result'])
 
 class Nintendo():
     def __init__(self, sessionToken):
@@ -113,16 +123,12 @@ class s2s():
         return json.loads(response.text)['hash']
 
 class Flapg():
-    def __init__(self, id_token, timestamp, guid, s2sHash = None):
-        if s2sHash:
-            hash = s2sHash
-        else:
-            hash = s2s(id_token, timestamp).getHash()
+    def __init__(self, id_token, timestamp, guid):
         self.headers = {
             'x-token': id_token,
             'x-time': str(timestamp),
             'x-guid': guid,
-            'x-hash': hash,
+            'x-hash': s2s(id_token, timestamp).getHash(),
             'x-ver': '3',
             'x-iid': 'nso',
         }
@@ -136,7 +142,7 @@ class Flapg():
         return json.loads(response.text)['result']
 
 class Login():
-    def __init__(self, userInfo, accessToken, guid, s2sHash = None):
+    def __init__(self, userInfo, accessToken, guid):
         self.headers = {
             'Host': 'api-lp1.znc.srv.nintendo.net',
             'Accept-Language': 'en-US',
@@ -157,7 +163,7 @@ class Login():
         self.userInfo = userInfo
         self.accessToken = accessToken
 
-        self.flapg = Flapg(self.accessToken, self.timestamp, self.guid, s2sHash).get()
+        self.flapg = Flapg(self.accessToken, self.timestamp, self.guid).get()
 
         self.account = None
 
@@ -178,19 +184,6 @@ class Login():
         self.account = json.loads(response.text)
         return self.account
 
-class FriendList(API):
-    def __init__(self):
-        super().__init__()
-
-        self.route = '/v3/Friend/List' # Define API route
-
-        self.friendList = [] # List of Friend object(s)
-
-    def populateList(self):
-        response = self.makeRequest(self.route)
-        arr = json.loads(response.text)['result']['friends']
-        self.friendList = [ Friend(friend) for friend in arr ]
-
 class User():
     def __init__(self, f):
         self.id = f.get('id')
@@ -207,21 +200,6 @@ class User():
     def description(self):
         return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
         + '   - Profile Picture: %s\n' % self.imageUri
-        + '   - Status: %s\n' % self.presence.description()
-        )
-
-class Friend(User):
-    def __init__(self, f):
-        super().__init__(f)
-        self.isFriend = f.get('isFriend')
-        self.isFavoriteFriend = f.get('isFavoriteFriend')
-        self.isServiceUser = f.get('isServiceUser')
-        self.friendCreatedAt = f.get('friendCreatedAt')
-
-    def description(self):
-        return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
-        + '   - Profile Picture: %s\n' % self.imageUri
-        + '   - Friend Creation Date: %s\n' % self.friendCreatedAt
         + '   - Status: %s\n' % self.presence.description()
         )
 

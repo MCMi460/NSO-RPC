@@ -32,12 +32,14 @@ class Discord():
                 continue
 
     def update(self):
-        self.api.updateLogin()
+        if time.time() - self.api.login['time'] >= 3600:
+            self.api.updateLogin()
+        self.api.getSelf()
         self.nickname = self.api.userInfo['nickname']
-        self.user = User(self.api.login.account['result'].get('user'))
+        self.user = self.api.user
 
         presence = self.user.presence
-        if presence.state != 'INACTIVE':
+        if presence.state == 'ONLINE':
             state = presence.game.sysDescription
             if not state:
                 state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
@@ -48,10 +50,10 @@ class Discord():
             self.rpc.clear()
 
     def background(self):
-        second = 60
+        second = 30
         while True:
             if self.running:
-                if second == 60:
+                if second == 30:
                     try:
                         self.update()
                     except KeyError:
@@ -59,7 +61,7 @@ class Discord():
                     second = 0
                 second += 1
             else:
-                second = 55
+                second = 25
             time.sleep(1)
 
 if __name__ == '__main__':
