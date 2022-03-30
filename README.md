@@ -39,7 +39,7 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 **A:** No. Your computer is saying that because it's a foreign executable file downloaded from the internet, so you should always be cautious about it. If you'd like, you can [build your own `exe`](#building).
 
 ***Q: You're not stealing my account, are you?***  
-**A:** Not me, personally. You'll have to ask [frozenpandaman (s2s)](https://github.com/frozenpandaman) and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps. [Read more here](#understanding), and be weary of any possible theft.
+**A:** Not me, personally. You'll have to ask [frozenpandaman](https://github.com/frozenpandaman) [(s2s)](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs#integration-and-use) and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps. [Read more here](#understanding), and be weary of any possible theft.
 
 ***Q: Do I need Discord open on my PC to use this application?***  
 **A:** Yes, Discord needs to be open for this application to even run in the first place.
@@ -73,6 +73,8 @@ open dist
 ```
 
 <h2 id = 'understanding'>Understanding</h2>
+
+### Warning: This comprehension guide is outdated as of commit d85286d
 
 This is going to be a detailed explanation on everything that I do here and exactly what is going on. If you're into that sort of stuff, keep reading. If not, feel free to skim and get a general idea of the procedures.  
 I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [GUI (app.py)](/client/app.py).  
