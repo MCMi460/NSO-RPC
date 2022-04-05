@@ -9,12 +9,8 @@ import threading
 from cli import *
 
 # NSO Variables
-session_token = None
-path = os.path.expanduser('~/Documents/NSO-RPC/private.txt')
-if os.path.isfile(path):
-    with open(path, 'r') as file:
-        session_token = json.loads(file.read())['session_token']
-client = Discord(session_token)
+session_token, user_lang = getToken(False)
+client = Discord(session_token, user_lang)
 # PyQt5 Variables
 style = """
 QWidget {
@@ -32,6 +28,12 @@ QLineEdit {
 QLabel {
   background-color: #F2F2F2;
   color: #3c3c3c;
+  text-align: center;
+}
+QComboBox {
+  background-color: #F2F2F2;
+  color: #3c3c3c;
+  border: 1px solid #dfdfdf;
   text-align: center;
 }
 QPushButton {
@@ -70,6 +72,10 @@ class GUI(Ui_MainWindow):
 
         self.lineEdit = self.groupBox.findChild(QLineEdit, 'lineEdit')
 
+        self.comboBox = self.groupBox.findChild(QComboBox, 'comboBox')
+        self.comboBox.clear()
+        self.comboBox.addItems(languages)
+
     def closeEvent(self, event):
         if not self.state:
             sys.exit()
@@ -79,10 +85,11 @@ class GUI(Ui_MainWindow):
         tray.controller.setChecked(True)
 
     def grabToken(self):
-        global session_token
+        global session_token, user_lang
         try:
             session_token = self.session.run(*self.session.login(self.waitUntil))
-            client.createCTX(session_token)
+            user_lang = self.comboBox.currentText()
+            client.createCTX(session_token, user_lang)
         except Exception as e:
             print(f'An error occurred! Chances are, you didn\'t paste the right link, but here\'s the error message:\n{e}')
             os._exit(1)

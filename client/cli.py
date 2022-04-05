@@ -7,15 +7,15 @@ import pypresence
 from api import *
 
 class Discord():
-    def __init__(self, session_token = None):
+    def __init__(self, session_token = None, user_lang = None):
         self.rpc = pypresence.Presence('637692124539650048')
         self.connect()
         self.running = False
-        if session_token:
-            self.createCTX(session_token)
+        if session_token and user_lang:
+            self.createCTX(session_token, user_lang)
 
-    def createCTX(self, session_token):
-        self.api = API(session_token)
+    def createCTX(self, session_token, user_lang):
+        self.api = API(session_token, user_lang)
         self.running = True
 
     def connect(self):
@@ -32,9 +32,15 @@ class Discord():
                 continue
 
     def update(self):
-        if time.time() - self.api.login['time'] >= 3600:
-            self.api.updateLogin()
-        self.api.getSelf()
+        for i in range(2):
+            try:
+                self.api.getSelf()
+                break
+            except:
+                if i > 0 or time.time() - self.api.login['time'] < 3600:
+                    raise Exception('Cannot get session token properly')
+                self.api.updateLogin()
+                continue
         self.nickname = self.api.userInfo['nickname']
         self.user = self.api.user
 
@@ -64,14 +70,29 @@ class Discord():
                 second = 25
             time.sleep(1)
 
-if __name__ == '__main__':
-    path = os.path.expanduser('~/Documents/NSO-RPC/private.txt')
-    if not os.path.isfile(path):
+def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/private.txt')):
+    session_token, user_lang = None, None
+    if os.path.isfile(path):
+        with open(path, 'r') as file:
+            try:
+                data = json.loads(file.read())
+                session_token = data['session_token']
+                user_lang = data['user_lang']
+                if not user_lang in languages:
+                    raise Exception('invalid user language')
+            except:
+                os.remove(path)
+                sys.exit()
+    elif manual:
         session = Session()
         session_token = session.run(*session.login(session.inputManually))
-    else:
-        with open(path, 'r') as file:
-            session_token = json.loads(file.read())['session_token']
+        user_lang = input('Please enter your language from the list below:\n%s\n> ' % ('\n'.join(languages)))
+        if not user_lang in languages:
+            raise Exception('invalid user language')
+    return session_token, user_lang
 
-    client = Discord(session_token)
+if __name__ == '__main__':
+    session_token, user_lang = getToken()
+
+    client = Discord(session_token, user_lang)
     client.background()

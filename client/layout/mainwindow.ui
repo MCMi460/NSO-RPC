@@ -51,6 +51,16 @@
      <string>Paste the URL here!</string>
     </property>
    </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>216</x>
+      <y>100</y>
+      <width>79</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">

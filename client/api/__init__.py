@@ -14,9 +14,22 @@ import re
 client_id = '71b963c1b7b6d119'
 version = 0.2
 nsoAppVersion = '2.0.0'
+languages = [ # ISO Language codes
+'en-US',
+'es-MX',
+'fr-CA',
+'ja-JP',
+'en-GB',
+'es-ES',
+'fr-FR',
+'de-DE',
+'it-IT',
+'nl-NL',
+'ru-RU'
+]
 
 class API():
-    def __init__(self, session_token):
+    def __init__(self, session_token, user_lang):
         self.headers = {
             'X-ProductVersion': '2.0.0',
             'X-Platform': 'iOS',
@@ -28,14 +41,15 @@ class API():
             'Accept-Encoding': 'gzip',
         }
 
-        self.tokenResponse = Nintendo(session_token).getServiceToken()
+        self.user_lang = user_lang
+        self.tokenResponse = Nintendo(session_token, self.user_lang).getServiceToken()
         self.id_token = self.tokenResponse['id_token']
         self.accessToken = self.tokenResponse['access_token']
         self.guid = str(uuid.uuid4())
 
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
 
-        self.userInfo = UsersMe(self.accessToken).get()
+        self.userInfo = UsersMe(self.accessToken, self.user_lang).get()
         self.login = {
             'login': None,
             'time': 0,
@@ -47,13 +61,14 @@ class API():
         with open(os.path.join(path, 'private.txt'), 'w') as file:
             file.write(json.dumps({
                 'session_token': session_token,
+                'user_lang': self.user_lang,
             }))
 
     def makeRequest(self, route):
         return requests.post(self.url + route, headers = self.headers)
 
     def updateLogin(self):
-        login = Login(self.userInfo, self.accessToken, self.guid)
+        login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
         login.loginToAccount()
         self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
         self.login = {
@@ -68,10 +83,11 @@ class API():
         self.user = User(json.loads(response.text)['result'])
 
 class Nintendo():
-    def __init__(self, sessionToken):
+    def __init__(self, sessionToken, userLang):
         self.headers = {
             'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
             'Accept': 'application/json',
+            'Accept-Language': userLang,
             'Accept-Encoding': 'gzip, deflate',
         }
         self.body = {
@@ -88,10 +104,11 @@ class Nintendo():
         return json.loads(response.text)
 
 class UsersMe():
-    def __init__(self, accessToken):
+    def __init__(self, accessToken, userLang):
         self.headers = {
             'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
             'Accept': 'application/json',
+            'Accept-Language': userLang,
             'Authorization': 'Bearer %s' % accessToken,
             'Host': 'api.accounts.nintendo.com',
             'Connection': 'Keep-Alive',
@@ -142,10 +159,10 @@ class Flapg():
         return json.loads(response.text)['result']
 
 class Login():
-    def __init__(self, userInfo, accessToken, guid):
+    def __init__(self, userInfo, userLang, accessToken, guid):
         self.headers = {
             'Host': 'api-lp1.znc.srv.nintendo.net',
-            'Accept-Language': 'en-US',
+            'Accept-Language': userLang,
             'User-Agent': 'com.nintendo.znca/' + nsoAppVersion + ' (Android/7.1.2)',
             'Accept': 'application/json',
             'X-ProductVersion': '2.0.0',
