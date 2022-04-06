@@ -28,7 +28,7 @@ class Discord():
             except Exception as e:
                 fails += 1
                 if fails > 500:
-                    sys.exit('Error, failed after 500 attempts\n\'%s\'' % e)
+                    sys.exit(log('Error, failed after 500 attempts\n\'%s\'' % e))
                 continue
 
     def update(self):
@@ -36,8 +36,9 @@ class Discord():
             try:
                 self.api.getSelf()
                 break
-            except:
-                if i > 0 or time.time() - self.api.login['time'] < 3600:
+            except Exception as e:
+                log(e)
+                if i > 0 or time.time() - self.api.login['time'] < 7170:
                     raise Exception('Cannot get session token properly')
                 self.api.updateLogin()
                 continue
@@ -80,9 +81,9 @@ def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/p
                 user_lang = data['user_lang']
                 if not user_lang in languages:
                     raise Exception('invalid user language')
-            except:
+            except Exception as e:
                 os.remove(path)
-                sys.exit()
+                sys.exit(log(e))
     elif manual:
         session = Session()
         session_token = session.run(*session.login(session.inputManually))
@@ -92,7 +93,10 @@ def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/p
     return session_token, user_lang
 
 if __name__ == '__main__':
-    session_token, user_lang = getToken()
+    try:
+        session_token, user_lang = getToken()
+    except Exception as e:
+        sys.exit(log(e))
 
     client = Discord(session_token, user_lang)
     client.background()

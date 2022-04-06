@@ -10,6 +10,7 @@ import base64
 import os
 import hashlib
 import re
+import pickle
 
 client_id = '71b963c1b7b6d119'
 version = 0.2
@@ -27,6 +28,14 @@ languages = [ # ISO Language codes
 'nl-NL',
 'ru-RU'
 ]
+
+def log(info, time = time.time()):
+    path = os.path.expanduser('~/Documents/NSO-RPC')
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    with open(os.path.join(path, 'logs.txt'), 'a') as file:
+        file.write('%s: %s\n' % (time, info))
+    return info
 
 class API():
     def __init__(self, session_token, user_lang):
@@ -68,6 +77,14 @@ class API():
         return requests.post(self.url + route, headers = self.headers)
 
     def updateLogin(self):
+        path = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
+        if os.path.isfile(path):
+            with open(path, 'rb') as file:
+                self.login = pickle.loads(file.read())
+                self.headers['Authorization'] = 'Bearer %s' % self.login['login'].account['result'].get('webApiServerCredential').get('accessToken')
+                log('Login from file')
+        if time.time() - self.login['time'] < 7170:
+            return
         login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
         login.loginToAccount()
         self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
@@ -75,6 +92,8 @@ class API():
             'login': login,
             'time': time.time(),
         }
+        with open(path, 'wb') as file:
+            file.write(pickle.dumps(self.login))
 
     def getSelf(self):
         self.route = '/v3/User/ShowSelf'
@@ -124,6 +143,7 @@ class UsersMe():
 
 class s2s():
     def __init__(self, id_token, timestamp):
+        log('Login from Flapg/s2s')
         self.headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'NSO-RPC/%s' % version,

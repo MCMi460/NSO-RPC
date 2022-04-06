@@ -91,7 +91,7 @@ class GUI(Ui_MainWindow):
             user_lang = self.comboBox.currentText()
             client.createCTX(session_token, user_lang)
         except Exception as e:
-            print(f'An error occurred! Chances are, you didn\'t paste the right link, but here\'s the error message:\n{e}')
+            print(log(f'An error occurred! Chances are, you didn\'t paste the right link, but here\'s the error message:\n{e}'))
             os._exit(1)
 
     def waitUntil(self):
