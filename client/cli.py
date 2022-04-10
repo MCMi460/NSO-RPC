@@ -15,7 +15,10 @@ class Discord():
             self.createCTX(session_token, user_lang)
 
     def createCTX(self, session_token, user_lang):
-        self.api = API(session_token, user_lang)
+        try:
+            self.api = API(session_token, user_lang)
+        except Exception as e:
+            sys.exit(log(e))
         self.running = True
 
     def connect(self):
