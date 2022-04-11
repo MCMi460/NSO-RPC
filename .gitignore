@@ -1,14 +1,22 @@
 # API
 private.*
+tempToken.*
+logs.*
 
 # Python
 venv/
 __pycache__/
 
+# Qt
+*.autosave
+
 # Compilation
 build/
 dist/
 setup.py
+
+# Tests
+test*.*
 
 # MacOS
 .DS_Store

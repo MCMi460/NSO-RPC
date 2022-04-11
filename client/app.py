@@ -6,6 +6,8 @@ from PyQt5.QtCore import *
 from layout import Ui_MainWindow
 import sys
 import threading
+import requests
+from qtwidgets import Toggle, AnimatedToggle
 from cli import *
 
 # NSO Variables
@@ -43,6 +45,8 @@ QPushButton {
   text-align: center;
 }
 """
+# self.mode = 1 is for token
+# self.mode = 2 is for full
 def getPath(path):
     try:
         root = sys._MEIPASS
@@ -61,10 +65,13 @@ class GUI(Ui_MainWindow):
 
         self.MainWindow.closeEvent = self.closeEvent
 
-        self.state = False
+        self.mode = 1
+        self.stackedWidget.setCurrentIndex(0)
         if not session_token:
             self.session = Session()
             threading.Thread(target = self.grabToken, daemon = True).start()
+        else:
+            self.changeState()
 
     def assignVariables(self):
         self.button = self.groupBox.findChild(QPushButton, 'pushButton')
@@ -76,13 +83,63 @@ class GUI(Ui_MainWindow):
         self.comboBox.clear()
         self.comboBox.addItems(languages)
 
-    def closeEvent(self, event):
-        if not self.state:
-            sys.exit()
+        # Home
+        self.selfImage = self.stackedWidget.findChild(QLabel, 'label_3')
+        self.selfImage.setScaledContents(True)
+        self.selfImage.setCursor(QCursor(Qt.PointingHandCursor))
+        self.selfImage.mousePressEvent = self.openPfp
+
+        self.namePlate = self.stackedWidget.findChild(QLabel, 'label_4')
+        self.namePlate.setAlignment(Qt.AlignCenter)
+        self.namePlate.setStyleSheet('color:#fff;')
+
+        self.groupBox_2.setStyleSheet('background-color: #e60012; border-radius: 0px;')
+
+        self.groupBox_2.findChild(QLabel, 'label_5').setStyleSheet('font-weight: bold; color: #fff;')
+        self.nSwitchIcon = self.groupBox_2.findChild(QLabel, 'label_6')
+        self.nSwitchIcon.setScaledContents(True)
+
+        self.groupBox_6.setStyleSheet('background-color: #fff; border: 0px; border-radius: 0px;')
+        for i in range(4):
+            if i == 3:
+                i += 2
+            group = self.stackedWidget.findChild(QGroupBox, 'groupBox_%s' % (i + 3))
+            group.setStyleSheet('background-color: #fff; border: 1px solid #dfdfdf; border-radius: 8px;')
+
+            if i == 5:
+                i -= 2
+            button = self.stackedWidget.findChild(QPushButton, 'pushButton_%s' % (i + 2))
+            button.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px; color: #3c3c3c;')
+            button.setCursor(QCursor(Qt.PointingHandCursor))
+            if i == 0:
+                button.clicked.connect(self.switchHome)
+            if i == 1:
+                button.clicked.connect(self.switchFriends)
+            if i == 2:
+                button.clicked.connect(self.switchSettings)
+            if i == 3:
+                button.clicked.connect(sys.exit)
+
+        self.presenceImage = self.stackedWidget.findChild(QLabel, 'label_8')
+        self.presenceImage.setScaledContents(True)
+
+        self.presenceText = self.stackedWidget.findChild(QLabel, 'label_7')
+        self.presenceState = self.stackedWidget.findChild(QLabel, 'label_10')
+        [ x.setStyleSheet('background-color: transparent;') for x in (self.presenceText,self.presenceState) ]
+
+        self.presenceDesc = self.stackedWidget.findChild(QLabel, 'label_9')
+        self.presenceDesc.setAlignment(Qt.AlignCenter)
+
+        # Settings
+        self.toggle = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggle.setGeometry(QRect(101,0,60,41))
+
+    def closeEvent(self, event = None):
+        if self.mode == 1:
+            sys.exit('User closed')
         event.ignore()
         self.MainWindow.hide()
         tray.show()
-        tray.controller.setChecked(True)
 
     def grabToken(self):
         global session_token, user_lang
@@ -95,23 +152,99 @@ class GUI(Ui_MainWindow):
             os._exit(1)
 
     def waitUntil(self):
-        while not self.state:
+        while self.mode == 1:
             pass
         return self.lineEdit.text().strip()
 
     def changeState(self):
-        self.state = True
-        self.MainWindow.close()
+        self.mode = 2
+        while not client.api:
+            pass
+        client.setApp(self.updatePresence)
+        client.update()
+
+        # Set user image
+        pixmap = QPixmap()
+        pixmap.loadFromData(requests.get(client.api.user.imageUri).content)
+        radius = 150
+
+        rounded = QPixmap(pixmap.size())
+        rounded.fill(QColor('transparent'))
+
+        painter = QPainter(rounded)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QBrush(pixmap))
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(pixmap.rect(), radius, radius)
+        del painter
+
+        self.selfImage.setPixmap(rounded)
+
+        # Set user details
+        self.namePlate.setText(client.api.user.name)
+
+        # Set NSwitch Icon
+        self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
+
+        # Set toggle state
+        self.toggle.setChecked(client.running)
+        self.toggle.toggled.connect(self.switch)
+
+        # Set home
+        self.switchHome()
+
+        # Switch screens
+        self.stackedWidget.setCurrentIndex(1)
+
+    def updatePresence(self):
+        def mousePressEvent(event = None):
+            pass
+        # Set presence image and game data
+        if client.api.user.presence.game.name:
+            pixmap = QPixmap()
+            pixmap.loadFromData(requests.get(client.api.user.presence.game.imageUri).content)
+            self.presenceImage.setPixmap(pixmap)
+
+            self.presenceText.setText(client.api.user.presence.game.name)
+            self.presenceState.setText(client.state)
+
+            self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
+            self.groupBox_7.mousePressEvent = self.openShop
+        else:
+            self.presenceImage.clear()
+            self.presenceText.setText('Offline')
+            self.presenceState.setText('')
+
+            self.groupBox_7.setCursor(QCursor(Qt.ArrowCursor))
+            self.groupBox_7.mousePressEvent = mousePressEvent
+
+    def switchHome(self):
+        self.stackedWidget_2.setCurrentIndex(0)
+
+    def switchFriends(self):
+        self.stackedWidget_2.setCurrentIndex(1)
+
+    def switchSettings(self):
+        self.stackedWidget_2.setCurrentIndex(2)
+
+    def openPfp(self, event = None):
+        webbrowser.open(client.api.user.imageUri)
+
+    def openShop(self, event = None):
+        webbrowser.open(client.api.user.presence.game.shopUri)
+
+    def switch(self):
+        client.running = not client.running
+        if not client.running:
+            client.rpc.clear()
 
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):
         QSystemTrayIcon.__init__(self, icon, parent)
         menu = QMenu(parent)
 
-        self.controller = menu.addAction('Discord')
-        self.controller.setCheckable(True)
-        self.controller.setChecked(client.running)
-        self.controller.toggled.connect(self.switch)
+        self.controller = menu.addAction('Open')
+        self.controller.triggered.connect(self.switch)
 
         quit = menu.addAction('Quit')
         quit.triggered.connect(sys.exit)
@@ -119,11 +252,8 @@ class SystemTrayApp(QSystemTrayIcon):
         self.setContextMenu(menu)
 
     def switch(self):
-        if session_token:
-            client.running = not client.running
-            self.controller.setChecked(client.running)
-            if not client.running:
-                client.rpc.clear()
+        tray.hide()
+        MainWindow.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -138,9 +268,6 @@ if __name__ == '__main__':
 
     threading.Thread(target = client.background, daemon = True).start()
 
-    if session_token:
-        tray.show()
-    else:
-        MainWindow.show()
+    MainWindow.show()
 
     sys.exit(app.exec_())

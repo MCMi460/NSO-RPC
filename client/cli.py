@@ -11,6 +11,8 @@ class Discord():
         self.rpc = pypresence.Presence('637692124539650048')
         self.connect()
         self.running = False
+        self.api = None
+        self.app = False
         if session_token and user_lang:
             self.createCTX(session_token, user_lang)
 
@@ -34,6 +36,9 @@ class Discord():
                     sys.exit(log('Error, failed after 500 attempts\n\'%s\'' % e))
                 continue
 
+    def setApp(self, function):
+        self.app = function
+
     def update(self):
         for i in range(2):
             try:
@@ -50,14 +55,17 @@ class Discord():
 
         presence = self.user.presence
         if presence.state in ('ONLINE','PLAYING'): # There may be more, please file an issue if this happens to fail
-            state = presence.game.sysDescription
-            if not state:
-                state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+            self.state = presence.game.sysDescription
+            if not self.state:
+                self.state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
                 if presence.game.totalPlayTime / 60 < 5:
-                    state = 'Played for a little while'
-            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
+                    self.state = 'Played for a little while'
+            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = self.state)
         else:
             self.rpc.clear()
+        # Set GUI
+        if self.app:
+            self.app()
 
     def background(self):
         second = 30

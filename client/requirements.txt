@@ -1,3 +1,4 @@
 requests
 pypresence
 pyqt5
+qtwidgets
