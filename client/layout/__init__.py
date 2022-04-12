@@ -61,7 +61,7 @@ class Ui_MainWindow(object):
         self.label_3.setText("")
         self.label_3.setObjectName("label_3")
         self.label_4 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_4.setGeometry(QtCore.QRect(20, 90, 60, 16))
+        self.label_4.setGeometry(QtCore.QRect(10, 90, 81, 16))
         self.label_4.setText("")
         self.label_4.setObjectName("label_4")
         self.label_5 = QtWidgets.QLabel(self.groupBox_2)
@@ -137,6 +137,9 @@ class Ui_MainWindow(object):
         self.label_12 = QtWidgets.QLabel(self.page_3)
         self.label_12.setGeometry(QtCore.QRect(10, 0, 101, 41))
         self.label_12.setObjectName("label_12")
+        self.pushButton_6 = QtWidgets.QPushButton(self.page_3)
+        self.pushButton_6.setGeometry(QtCore.QRect(140, 550, 111, 41))
+        self.pushButton_6.setObjectName("pushButton_6")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -158,6 +161,7 @@ class Ui_MainWindow(object):
         self.label_9.setText(_translate("MainWindow", "Currently Playing"))
         self.label_11.setText(_translate("MainWindow", "Do this later"))
         self.label_12.setText(_translate("MainWindow", "Update status:"))
+        self.pushButton_6.setText(_translate("MainWindow", "Logout"))
 
 
 if __name__ == "__main__":

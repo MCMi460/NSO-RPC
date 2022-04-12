@@ -154,9 +154,9 @@
       <widget class="QLabel" name="label_4">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>90</y>
-         <width>60</width>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
@@ -405,6 +405,19 @@
        </property>
        <property name="text">
         <string>Update status:</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_6">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>550</y>
+         <width>111</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Logout</string>
        </property>
       </widget>
      </widget>

@@ -120,6 +120,10 @@ class GUI(Ui_MainWindow):
             if i == 3:
                 button.clicked.connect(sys.exit)
 
+        self.logout = self.stackedWidget.findChild(QPushButton, 'pushButton_6')
+        self.logout.clicked.connect(client.logout)
+        self.logout.setCursor(QCursor(Qt.PointingHandCursor))
+
         self.presenceImage = self.stackedWidget.findChild(QLabel, 'label_8')
         self.presenceImage.setScaledContents(True)
 

@@ -82,6 +82,12 @@ class Discord():
                 second = 25
             time.sleep(1)
 
+    def logout(self):
+        path = os.path.expanduser('~/Documents/NSO-RPC/private.txt')
+        if os.path.isfile(path):
+            os.remove(path)
+            sys.exit()
+
 def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/private.txt')):
     session_token, user_lang = None, None
     if os.path.isfile(path):
@@ -101,6 +107,9 @@ def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/p
         user_lang = input('Please enter your language from the list below:\n%s\n> ' % ('\n'.join(languages)))
         if not user_lang in languages:
             raise Exception('invalid user language')
+    tempToken = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
+    if not os.path.isfile(path) and os.path.isfile(tempToken):
+        os.remove(tempToken)
     return session_token, user_lang
 
 if __name__ == '__main__':
