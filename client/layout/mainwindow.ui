@@ -309,10 +309,10 @@
       <widget class="QGroupBox" name="groupBox_7">
        <property name="geometry">
         <rect>
-         <x>59</x>
+         <x>20</x>
          <y>90</y>
-         <width>281</width>
-         <height>91</height>
+         <width>351</width>
+         <height>121</height>
         </rect>
        </property>
        <property name="title">
@@ -321,14 +321,17 @@
        <widget class="QLabel" name="label_7">
         <property name="geometry">
          <rect>
-          <x>90</x>
+          <x>120</x>
           <y>15</y>
-          <width>171</width>
-          <height>21</height>
+          <width>221</width>
+          <height>31</height>
          </rect>
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
         </property>
        </widget>
        <widget class="QLabel" name="label_8">
@@ -336,8 +339,8 @@
          <rect>
           <x>15</x>
           <y>15</y>
-          <width>61</width>
-          <height>61</height>
+          <width>91</width>
+          <height>91</height>
          </rect>
         </property>
         <property name="text">
@@ -347,16 +350,11 @@
        <widget class="QLabel" name="label_10">
         <property name="geometry">
          <rect>
-          <x>90</x>
-          <y>35</y>
-          <width>171</width>
-          <height>31</height>
+          <x>120</x>
+          <y>60</y>
+          <width>221</width>
+          <height>41</height>
          </rect>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
         </property>
         <property name="text">
          <string/>
@@ -369,7 +367,7 @@
       <widget class="QLabel" name="label_9">
        <property name="geometry">
         <rect>
-         <x>115</x>
+         <x>110</x>
          <y>60</y>
          <width>171</width>
          <height>21</height>
@@ -401,7 +399,7 @@
         <rect>
          <x>10</x>
          <y>0</y>
-         <width>151</width>
+         <width>101</width>
          <height>41</height>
         </rect>
        </property>

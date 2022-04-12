@@ -206,7 +206,9 @@ class GUI(Ui_MainWindow):
             self.presenceImage.setPixmap(pixmap)
 
             self.presenceText.setText(client.api.user.presence.game.name)
+            self.presenceText.adjustSize()
             self.presenceState.setText(client.state)
+            self.presenceState.adjustSize()
 
             self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
             self.groupBox_7.mousePressEvent = self.openShop
