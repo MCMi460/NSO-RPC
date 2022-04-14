@@ -297,6 +297,11 @@ class GUI(Ui_MainWindow):
     def updatePresence(self, user):
         def mousePressEvent(event = None):
             pass
+        def openShop(url):
+            def e(event = None):
+                event.ignore()
+                webbrowser.open(url)
+            return lambda event : e(event)
 
         # Set user pic
         icon = self.label_11
@@ -306,6 +311,7 @@ class GUI(Ui_MainWindow):
 
         try:
             text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
+            state = ''
         except:
             text = 'Added Friend at: %s' % time.strftime('%Y-%m-%d', time.localtime(user.friendCreatedAt))
             state = timeSince(user.presence.logoutAt)
@@ -324,7 +330,7 @@ class GUI(Ui_MainWindow):
                     state = 'Played for a little while'
 
             self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
-            self.groupBox_7.mousePressEvent = self.openShop
+            self.groupBox_7.mousePressEvent = openShop(user.presence.game.shopUri)
         else:
             self.presenceImage.clear()
             self.presenceText.setText('Offline')
@@ -350,9 +356,6 @@ class GUI(Ui_MainWindow):
 
     def openPfp(self, event = None):
         webbrowser.open(client.api.user.imageUri)
-
-    def openShop(self, event = None):
-        webbrowser.open(client.api.user.presence.game.shopUri)
 
     def switch(self):
         client.running = not client.running
