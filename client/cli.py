@@ -12,7 +12,7 @@ class Discord():
         self.connect()
         self.running = False
         self.api = None
-        self.app = False
+        self.gui = False
         if session_token and user_lang:
             self.createCTX(session_token, user_lang)
 
@@ -38,6 +38,7 @@ class Discord():
 
     def setApp(self, function):
         self.app = function
+        self.gui = True
 
     def update(self):
         for i in range(2):
@@ -55,17 +56,17 @@ class Discord():
 
         presence = self.user.presence
         if presence.state in ('ONLINE','PLAYING'): # There may be more, please file an issue if this happens to fail
-            self.state = presence.game.sysDescription
-            if not self.state:
-                self.state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+            state = presence.game.sysDescription
+            if not state:
+                state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
                 if presence.game.totalPlayTime / 60 < 5:
-                    self.state = 'Played for a little while'
-            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = self.state)
+                    state = 'Played for a little while'
+            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
         else:
             self.rpc.clear()
         # Set GUI
-        if self.app:
-            self.app()
+        if self.gui:
+            self.app(self.user)
 
     def background(self):
         second = 30
@@ -83,9 +84,11 @@ class Discord():
             time.sleep(1)
 
     def logout(self):
-        path = os.path.expanduser('~/Documents/NSO-RPC/private.txt')
-        if os.path.isfile(path):
-            os.remove(path)
+        path = os.path.expanduser('~/Documents/NSO-RPC')
+        if os.path.isfile(os.path.join(path, 'private.txt')):
+            os.remove(os.path.join(path, 'private.txt'))
+            try:os.remove(os.path.join(path, 'settings.txt'))
+            except:pass
             sys.exit()
 
 def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/private.txt')):

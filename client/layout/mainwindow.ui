@@ -213,7 +213,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Home</string>
+        <string>Profile</string>
        </property>
       </widget>
      </widget>
@@ -310,7 +310,7 @@
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>90</y>
+         <y>150</y>
          <width>351</width>
          <height>121</height>
         </rect>
@@ -368,7 +368,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>60</y>
+         <y>120</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -377,20 +377,75 @@
         <string>Currently Playing</string>
        </property>
       </widget>
-     </widget>
-     <widget class="QWidget" name="page_2">
       <widget class="QLabel" name="label_11">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>200</y>
-         <width>141</width>
-         <height>71</height>
+         <x>30</x>
+         <y>10</y>
+         <width>91</width>
+         <height>91</height>
         </rect>
        </property>
        <property name="text">
-        <string>Do this later</string>
+        <string/>
        </property>
+      </widget>
+      <widget class="QLabel" name="label_13">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>10</y>
+         <width>211</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_14">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>60</y>
+         <width>231</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="page_2">
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="geometry">
+        <rect>
+         <x>-10</x>
+         <y>0</y>
+         <width>401</width>
+         <height>601</height>
+        </rect>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>385</width>
+          <height>599</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="page_3">

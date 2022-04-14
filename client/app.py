@@ -7,6 +7,7 @@ from layout import Ui_MainWindow
 import sys
 import threading
 import requests
+import time
 from qtwidgets import Toggle, AnimatedToggle
 from cli import *
 
@@ -44,6 +45,22 @@ QPushButton {
   border-radius: 10px;
   text-align: center;
 }
+QScrollBar:vertical {
+    border: 0px;
+    background-color: transparent;
+}
+QScrollBar::handle:vertical {
+    background-color: #393939;
+    border-radius: 4px;
+}
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    background: none;
+    border: none;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+    border: none;
+}
 """
 # self.mode = 1 is for token
 # self.mode = 2 is for full
@@ -54,10 +71,40 @@ def getPath(path):
         root = os.path.abspath('.')
 
     return os.path.join(root, path)
+def up(_label,image):
+    _label.clear()
+    while True:
+        try:
+            _pixmap = QPixmap()
+            _pixmap.loadFromData(requests.get(image).content)
+            break
+        except:
+            continue
+    _label.setPixmap(_pixmap)
+def timeSince(epoch:int):
+    if epoch == 0:
+        return ''
+    offset = time.time() - epoch
+    array = {
+        'minute': 60,
+        'hour': 60,
+        'day': 24,
+        'year': 365,
+        'decade': 10,
+    }
+    unit = 'second'
+    for i in array:
+        if offset >= array[i]:
+            offset = offset / array[i]
+            unit = i
+        else:
+            break
+    return 'Last online %s %s%s ago' % (int(offset), unit, ('' if offset == 1 else 's'))
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
         self.MainWindow = MainWindow
+        self.MainWindow.setFixedSize(600, 600)
 
     def selfService(self):
         self.MainWindow.setStyleSheet(style)
@@ -112,7 +159,7 @@ class GUI(Ui_MainWindow):
             button.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px; color: #3c3c3c;')
             button.setCursor(QCursor(Qt.PointingHandCursor))
             if i == 0:
-                button.clicked.connect(self.switchHome)
+                button.clicked.connect(self.switchMe)
             if i == 1:
                 button.clicked.connect(self.switchFriends)
             if i == 2:
@@ -126,6 +173,7 @@ class GUI(Ui_MainWindow):
 
         self.presenceImage = self.stackedWidget.findChild(QLabel, 'label_8')
         self.presenceImage.setScaledContents(True)
+        self.label_11.setScaledContents(True)
 
         self.presenceText = self.stackedWidget.findChild(QLabel, 'label_7')
         self.presenceState = self.stackedWidget.findChild(QLabel, 'label_10')
@@ -187,6 +235,52 @@ class GUI(Ui_MainWindow):
         # Set user details
         self.namePlate.setText(client.api.user.name)
 
+        # Friends
+        client.api.getFriends()
+        page = self.scrollAreaWidgetContents
+        layout = QGridLayout()
+        j = 0
+        n = 0
+        overlay = QGroupBox()
+        def openFriend(friend):
+            def e(event = None):
+                event.ignore()
+                self.updatePresence(friend)
+                self.switchHome()
+                client.gui = False
+            return lambda event : e(event)
+        for i in range(len(client.api.friends)):
+            overlay.move(0, 0)
+            overlay.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px;')
+            overlay.setFixedSize(81 * 4 + (4 * 10), 111)
+            if j == 3:
+                layout.addWidget(overlay)
+                overlay = QGroupBox()
+                n += 1
+            j = i % 4
+
+            friend = client.api.friends[i]
+            groupBox = QGroupBox(overlay)
+            groupBox.setStyleSheet('background-color: #fff; border: 1px solid #dfdfdf; border-radius: 8px;')
+
+            groupBox.setGeometry(QRect(10 + (j * 91), 0, 81, 111))
+            groupBox.setFixedSize(81, 111)
+
+            namePlate = QLabel(groupBox)
+            namePlate.setGeometry(0, 81, 81, 30)
+            namePlate.setAlignment(Qt.AlignCenter)
+            namePlate.setText(friend.name)
+
+            label = QLabel(groupBox)
+            label.setGeometry(QRect(0, 0, 81, 81))
+            label.setScaledContents(True)
+            threading.Thread(target = up, args = (label,friend.imageUri), daemon = True).start()
+
+            groupBox.mousePressEvent = openFriend(friend)
+            groupBox.setCursor(QCursor(Qt.PointingHandCursor))
+
+        page.setLayout(layout)
+
         # Set NSwitch Icon
         self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
 
@@ -195,34 +289,55 @@ class GUI(Ui_MainWindow):
         self.toggle.toggled.connect(self.switch)
 
         # Set home
-        self.switchHome()
+        self.switchMe()
 
         # Switch screens
         self.stackedWidget.setCurrentIndex(1)
 
-    def updatePresence(self):
+    def updatePresence(self, user):
         def mousePressEvent(event = None):
             pass
-        # Set presence image and game data
-        if client.api.user.presence.game.name:
-            pixmap = QPixmap()
-            pixmap.loadFromData(requests.get(client.api.user.presence.game.imageUri).content)
-            self.presenceImage.setPixmap(pixmap)
 
-            self.presenceText.setText(client.api.user.presence.game.name)
+        # Set user pic
+        icon = self.label_11
+        threading.Thread(target = up, args = (icon,user.imageUri), daemon = True).start()
+
+        self.label_13.setText(user.name)
+
+        try:
+            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
+        except:
+            text = 'Added Friend at: %s' % time.strftime('%Y-%m-%d', time.localtime(user.friendCreatedAt))
+            state = timeSince(user.presence.logoutAt)
+        self.label_14.setText(text)
+
+        # Set presence image and game data
+        if user.presence.game.name:
+            threading.Thread(target = up, args = (self.presenceImage,user.presence.game.imageUri), daemon = True).start()
+
+            self.presenceText.setText(user.presence.game.name)
             self.presenceText.adjustSize()
-            self.presenceState.setText(client.state)
-            self.presenceState.adjustSize()
+            state = user.presence.game.sysDescription
+            if not state:
+                state = 'Played for %s hours or more' % (int(user.presence.game.totalPlayTime / 60 / 5) * 5)
+                if user.presence.game.totalPlayTime / 60 < 5:
+                    state = 'Played for a little while'
 
             self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
             self.groupBox_7.mousePressEvent = self.openShop
         else:
             self.presenceImage.clear()
             self.presenceText.setText('Offline')
-            self.presenceState.setText('')
 
             self.groupBox_7.setCursor(QCursor(Qt.ArrowCursor))
             self.groupBox_7.mousePressEvent = mousePressEvent
+        self.presenceState.setText(state)
+        self.presenceState.adjustSize()
+
+    def switchMe(self):
+        client.gui = True
+        self.updatePresence(client.user)
+        self.switchHome()
 
     def switchHome(self):
         self.stackedWidget_2.setCurrentIndex(0)
@@ -243,6 +358,8 @@ class GUI(Ui_MainWindow):
         client.running = not client.running
         if not client.running:
             client.rpc.clear()
+            client.api.user.presence.game.name = ''
+            self.updatePresence(client.api.user)
 
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):

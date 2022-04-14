@@ -64,6 +64,8 @@ class API():
             'time': 0,
         }
 
+        self.friends = []
+
         path = os.path.expanduser('~/Documents/NSO-RPC')
         if not os.path.isdir(path):
             os.mkdir(path)
@@ -96,10 +98,15 @@ class API():
             file.write(pickle.dumps(self.login))
 
     def getSelf(self):
-        self.route = '/v3/User/ShowSelf'
+        route = '/v3/User/ShowSelf'
 
-        response = self.makeRequest(self.route)
+        response = self.makeRequest(route)
         self.user = User(json.loads(response.text)['result'])
+
+    def getFriends(self):
+        list = FriendList()
+        list.populateList(self)
+        self.friends = list.friendList
 
 class Nintendo():
     def __init__(self, sessionToken, userLang):
@@ -239,6 +246,33 @@ class User():
         + '   - Profile Picture: %s\n' % self.imageUri
         + '   - Status: %s\n' % self.presence.description()
         )
+
+class Friend(User):
+    def __init__(self, f):
+        super().__init__(f)
+        self.isFriend = f.get('isFriend')
+        self.isFavoriteFriend = f.get('isFavoriteFriend')
+        self.isServiceUser = f.get('isServiceUser')
+        self.friendCreatedAt = f.get('friendCreatedAt')
+
+    def description(self):
+        return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
+        + '   - Profile Picture: %s\n' % self.imageUri
+        + '   - Is Favorite: %s\n' % self.isFavoriteFriend
+        + '   - Friend Creation Date: %s\n' % self.friendCreatedAt
+        + '   - Status: %s\n' % self.presence.description()
+        )
+
+class FriendList():
+    def __init__(self):
+        self.route = '/v3/Friend/List' # Define API route
+
+        self.friendList = [] # List of Friend object(s)
+
+    def populateList(self, API:API):
+        response = API.makeRequest(self.route)
+        arr = json.loads(response.text)['result']['friends']
+        self.friendList = [ Friend(friend) for friend in arr ]
 
 class Presence():
     def __init__(self, f):

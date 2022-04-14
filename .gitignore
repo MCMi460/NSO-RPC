@@ -1,6 +1,9 @@
 # API
 private.*
 tempToken.*
+
+# App
+settings.*
 logs.*
 
 # Python
