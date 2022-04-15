@@ -99,6 +99,7 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
+friendTime = time.time()
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
@@ -250,6 +251,7 @@ class GUI(Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(1)
 
     def updatePresence(self, user):
+        global friendTime
         def mousePressEvent(event = None):
             pass
         def openLink(url):
@@ -257,6 +259,26 @@ class GUI(Ui_MainWindow):
                 event.ignore()
                 webbrowser.open(url)
             return lambda event : e(event)
+
+        # If the player is the user
+        if user == client.api.user:
+            if time.time() - friendTime >= 60:
+                n = len(client.api.friends)
+                client.api.getFriends()
+                if n != len(client.api.friends):
+                    sys.exit()
+                friendTime = time.time()
+
+            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
+            state = ''
+        else:
+            zone = '%Y/%m/%d'
+            if client.api.userInfo['language'] == 'en-US':
+                zone = '%m/%d/%Y'
+            elif client.api.userInfo['language'] == 'en-GB':
+                zone = '%d/%m/%Y'
+            text = 'Added Friend at: %s' % time.strftime(zone, time.localtime(user.friendCreatedAt))
+            state = timeSince(user.presence.logoutAt)
 
         if not user.image:
             user.image = loadPix(user.imageUri)
@@ -268,12 +290,6 @@ class GUI(Ui_MainWindow):
 
         self.label_13.setText(user.name)
 
-        try:
-            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
-            state = ''
-        except:
-            text = 'Added Friend at: %s' % time.strftime('%Y-%m-%d', time.localtime(user.friendCreatedAt))
-            state = timeSince(user.presence.logoutAt)
         self.label_14.setText(text)
 
         # Set presence image and game data
@@ -299,9 +315,22 @@ class GUI(Ui_MainWindow):
         self.presenceState.setText(state)
         self.presenceState.adjustSize()
 
-    def setFriend(self, i):
+    def setFriendIcons(self, layout):
         global client
-        client.api.friends[i].image = loadPix(client.api.friends[i].imageUri)
+        n = 0
+        i = 0
+        for i in range(layout.count()):
+            try:
+                for items in layout.itemAt(i).widget().findChildren(QGroupBox):
+                    i = 0
+                    for item in items.findChildren(QLabel):
+                        if i == 1:
+                            client.api.friends[n].image = loadPix(client.api.friends[n].imageUri)
+                            up(item,client.api.friends[n].image)
+                        i += 1
+                    n += 1
+            except:
+                break
 
     def updateFriends(self):
         client.api.getFriends()
@@ -346,21 +375,11 @@ class GUI(Ui_MainWindow):
 
             groupBox.mousePressEvent = openFriend(i)
             groupBox.setCursor(QCursor(Qt.PointingHandCursor))
+        layout.addItem(QSpacerItem(0,600))
 
         page.setLayout(layout)
-        def whatever():
-            n = 0
-            i = 0
-            for i in range(layout.count()):
-                for items in layout.itemAt(i).widget().findChildren(QGroupBox):
-                    i = 0
-                    for item in items.findChildren(QLabel):
-                        if i == 1:
-                            self.setFriend(n)
-                            up(item,client.api.friends[n].image)
-                        i += 1
-                    n += 1
-        threading.Thread(target = whatever, args = (), daemon = True).start()
+
+        threading.Thread(target = self.setFriendIcons, args = (layout,), daemon = True).start()
 
     def switchMe(self):
         client.gui = True

@@ -56,7 +56,7 @@ class Discord():
         self.user = self.api.user
 
         presence = self.user.presence
-        if presence.state in ('ONLINE','PLAYING'): # There may be more, please file an issue if this happens to fail
+        if presence.game.name: # Please file an issue if this happens to fail
             state = presence.game.sysDescription
             if not state:
                 state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
