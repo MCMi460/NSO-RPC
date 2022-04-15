@@ -4,6 +4,7 @@ import sys
 import os
 import time
 import pypresence
+import threading
 from api import *
 
 class Discord():
@@ -66,7 +67,7 @@ class Discord():
             self.rpc.clear()
         # Set GUI
         if self.gui:
-            self.app(self.user)
+            threading.Thread(target = self.app, args = (self.user,), daemon = True).start()
 
     def background(self):
         second = 30

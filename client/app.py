@@ -71,16 +71,15 @@ def getPath(path):
         root = os.path.abspath('.')
 
     return os.path.join(root, path)
+def loadPix(url):
+    _pixmap = QPixmap()
+    _pixmap.loadFromData(requests.get(url).content)
+    return _pixmap
 def up(_label,image):
     _label.clear()
-    while True:
-        try:
-            _pixmap = QPixmap()
-            _pixmap.loadFromData(requests.get(image).content)
-            break
-        except:
-            continue
-    _label.setPixmap(_pixmap)
+    if isinstance(image,str):
+        image = loadPix(image)
+    _label.setPixmap(image)
 def timeSince(epoch:int):
     if epoch == 0:
         return ''
@@ -99,7 +98,7 @@ def timeSince(epoch:int):
             unit = i
         else:
             break
-    return 'Last online %s %s%s ago' % (int(offset), unit, ('' if offset == 1 else 's'))
+    return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
@@ -216,18 +215,17 @@ class GUI(Ui_MainWindow):
         client.update()
 
         # Set user image
-        pixmap = QPixmap()
-        pixmap.loadFromData(requests.get(client.api.user.imageUri).content)
+        client.api.user.image = loadPix(client.api.user.imageUri)
         radius = 150
 
-        rounded = QPixmap(pixmap.size())
+        rounded = QPixmap(client.api.user.image.size())
         rounded.fill(QColor('transparent'))
 
         painter = QPainter(rounded)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QBrush(pixmap))
+        painter.setBrush(QBrush(client.api.user.image))
         painter.setPen(Qt.NoPen)
-        painter.drawRoundedRect(pixmap.rect(), radius, radius)
+        painter.drawRoundedRect(client.api.user.image.rect(), radius, radius)
         del painter
 
         self.selfImage.setPixmap(rounded)
@@ -236,16 +234,87 @@ class GUI(Ui_MainWindow):
         self.namePlate.setText(client.api.user.name)
 
         # Friends
+        self.updateFriends()
+
+        # Set NSwitch Icon
+        self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
+
+        # Set toggle state
+        self.toggle.setChecked(client.running)
+        self.toggle.toggled.connect(self.switch)
+
+        # Set home
+        self.switchMe()
+
+        # Switch screens
+        self.stackedWidget.setCurrentIndex(1)
+
+    def updatePresence(self, user):
+        def mousePressEvent(event = None):
+            pass
+        def openLink(url):
+            def e(event = None):
+                event.ignore()
+                webbrowser.open(url)
+            return lambda event : e(event)
+
+        if not user.image:
+            user.image = loadPix(user.imageUri)
+
+        # Set user pic
+        self.label_11.setPixmap(user.image)
+        self.label_11.mousePressEvent = openLink(user.imageUri)
+        self.label_11.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.label_13.setText(user.name)
+
+        try:
+            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
+            state = ''
+        except:
+            text = 'Added Friend at: %s' % time.strftime('%Y-%m-%d', time.localtime(user.friendCreatedAt))
+            state = timeSince(user.presence.logoutAt)
+        self.label_14.setText(text)
+
+        # Set presence image and game data
+        if user.presence.game.name:
+            threading.Thread(target = up, args = (self.presenceImage,user.presence.game.imageUri), daemon = True).start()
+
+            self.presenceText.setText(user.presence.game.name)
+            self.presenceText.adjustSize()
+            state = user.presence.game.sysDescription
+            if not state:
+                state = 'Played for %s hours or more' % (int(user.presence.game.totalPlayTime / 60 / 5) * 5)
+                if user.presence.game.totalPlayTime / 60 < 5:
+                    state = 'Played for a little while'
+
+            self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
+            self.groupBox_7.mousePressEvent = openLink(user.presence.game.shopUri)
+        else:
+            self.presenceImage.clear()
+            self.presenceText.setText('Offline')
+
+            self.groupBox_7.setCursor(QCursor(Qt.ArrowCursor))
+            self.groupBox_7.mousePressEvent = mousePressEvent
+        self.presenceState.setText(state)
+        self.presenceState.adjustSize()
+
+    def setFriend(self, i):
+        global client
+        client.api.friends[i].image = loadPix(client.api.friends[i].imageUri)
+
+    def updateFriends(self):
         client.api.getFriends()
-        page = self.scrollAreaWidgetContents
+        self.scrollArea.setWidget(QWidget())
+        page = self.scrollArea.widget()
         layout = QGridLayout()
         j = 0
         n = 0
         overlay = QGroupBox()
-        def openFriend(friend):
+        def openFriend(i):
             def e(event = None):
                 event.ignore()
-                self.updatePresence(friend)
+                self.updatePresence(client.api.friends[i])
                 self.switchHome()
                 client.gui = False
             return lambda event : e(event)
@@ -274,71 +343,24 @@ class GUI(Ui_MainWindow):
             label = QLabel(groupBox)
             label.setGeometry(QRect(0, 0, 81, 81))
             label.setScaledContents(True)
-            threading.Thread(target = up, args = (label,friend.imageUri), daemon = True).start()
 
-            groupBox.mousePressEvent = openFriend(friend)
+            groupBox.mousePressEvent = openFriend(i)
             groupBox.setCursor(QCursor(Qt.PointingHandCursor))
 
         page.setLayout(layout)
-
-        # Set NSwitch Icon
-        self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
-
-        # Set toggle state
-        self.toggle.setChecked(client.running)
-        self.toggle.toggled.connect(self.switch)
-
-        # Set home
-        self.switchMe()
-
-        # Switch screens
-        self.stackedWidget.setCurrentIndex(1)
-
-    def updatePresence(self, user):
-        def mousePressEvent(event = None):
-            pass
-        def openShop(url):
-            def e(event = None):
-                event.ignore()
-                webbrowser.open(url)
-            return lambda event : e(event)
-
-        # Set user pic
-        icon = self.label_11
-        threading.Thread(target = up, args = (icon,user.imageUri), daemon = True).start()
-
-        self.label_13.setText(user.name)
-
-        try:
-            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
-            state = ''
-        except:
-            text = 'Added Friend at: %s' % time.strftime('%Y-%m-%d', time.localtime(user.friendCreatedAt))
-            state = timeSince(user.presence.logoutAt)
-        self.label_14.setText(text)
-
-        # Set presence image and game data
-        if user.presence.game.name:
-            threading.Thread(target = up, args = (self.presenceImage,user.presence.game.imageUri), daemon = True).start()
-
-            self.presenceText.setText(user.presence.game.name)
-            self.presenceText.adjustSize()
-            state = user.presence.game.sysDescription
-            if not state:
-                state = 'Played for %s hours or more' % (int(user.presence.game.totalPlayTime / 60 / 5) * 5)
-                if user.presence.game.totalPlayTime / 60 < 5:
-                    state = 'Played for a little while'
-
-            self.groupBox_7.setCursor(QCursor(Qt.PointingHandCursor))
-            self.groupBox_7.mousePressEvent = openShop(user.presence.game.shopUri)
-        else:
-            self.presenceImage.clear()
-            self.presenceText.setText('Offline')
-
-            self.groupBox_7.setCursor(QCursor(Qt.ArrowCursor))
-            self.groupBox_7.mousePressEvent = mousePressEvent
-        self.presenceState.setText(state)
-        self.presenceState.adjustSize()
+        def whatever():
+            n = 0
+            i = 0
+            for i in range(layout.count()):
+                for items in layout.itemAt(i).widget().findChildren(QGroupBox):
+                    i = 0
+                    for item in items.findChildren(QLabel):
+                        if i == 1:
+                            self.setFriend(n)
+                            up(item,client.api.friends[n].image)
+                        i += 1
+                    n += 1
+        threading.Thread(target = whatever, args = (), daemon = True).start()
 
     def switchMe(self):
         client.gui = True

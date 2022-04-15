@@ -233,6 +233,7 @@ class User():
         self.id = f.get('id')
         self.nsaId = f.get('nsaId')
         self.imageUri = f.get('imageUri')
+        self.image = None
         self.name = f.get('name')
         self.supportId = f.get('supportId')
         self.isChildRestricted = f.get('isChildRestricted')
