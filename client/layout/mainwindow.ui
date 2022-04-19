@@ -475,6 +475,19 @@
         <string>Logout</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_15">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Dark Mode:</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>

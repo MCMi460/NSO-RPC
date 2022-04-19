@@ -76,8 +76,8 @@ class Discord():
                 if second == 30:
                     try:
                         self.update()
-                    except KeyError:
-                        pass
+                    except Exception as e:
+                        sys.exit(log(e))
                     second = 0
                 second += 1
             else:
@@ -87,7 +87,8 @@ class Discord():
     def logout(self):
         path = os.path.expanduser('~/Documents/NSO-RPC')
         if os.path.isfile(os.path.join(path, 'private.txt')):
-            os.remove(os.path.join(path, 'private.txt'))
+            try:os.remove(os.path.join(path, 'private.txt'))
+            except:pass
             try:os.remove(os.path.join(path, 'settings.txt'))
             except:pass
             sys.exit()

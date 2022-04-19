@@ -159,6 +159,9 @@ class Ui_MainWindow(object):
         self.pushButton_6 = QtWidgets.QPushButton(self.page_3)
         self.pushButton_6.setGeometry(QtCore.QRect(140, 550, 111, 41))
         self.pushButton_6.setObjectName("pushButton_6")
+        self.label_15 = QtWidgets.QLabel(self.page_3)
+        self.label_15.setGeometry(QtCore.QRect(10, 50, 101, 21))
+        self.label_15.setObjectName("label_15")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -180,6 +183,7 @@ class Ui_MainWindow(object):
         self.label_9.setText(_translate("MainWindow", "Currently Playing"))
         self.label_12.setText(_translate("MainWindow", "Update status:"))
         self.pushButton_6.setText(_translate("MainWindow", "Logout"))
+        self.label_15.setText(_translate("MainWindow", "Dark Mode:"))
 
 
 if __name__ == "__main__":

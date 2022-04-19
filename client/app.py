@@ -40,7 +40,7 @@ QComboBox {
   text-align: center;
 }
 QPushButton {
-  color: #fff;
+  color: #ffffff;
   background-color: #e60012;
   border-radius: 10px;
   text-align: center;
@@ -62,6 +62,7 @@ QScrollBar::add-line, QScrollBar::sub-line {
     border: none;
 }
 """
+darkMode = style.replace('#F2F2F2','#2b2828').replace('#dfdfdf', '#383333').replace('#ffffff', '#e6e6e6').replace('#fff', '#1e2024').replace('#393939', '#c4bebe').replace('#3c3c3c', '#fff')
 # self.mode = 1 is for token
 # self.mode = 2 is for full
 def getPath(path):
@@ -99,6 +100,19 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
+settingsFile = os.path.expanduser('~/Documents/NSO-RPC/settings.txt')
+settings = {
+    'dark': False,
+}
+def writeSettings():
+    try:os.mkdir(os.path.dirname(settingsFile))
+    except:pass
+    with open(settingsFile, 'w') as file:
+        file.write(json.dumps(settings))
+def readSettings():
+    global settings
+    with open(settingsFile, 'r') as file:
+        settings = json.loads(file.read())
 friendTime = time.time()
 iconsStorage = {}
 
@@ -107,13 +121,24 @@ class GUI(Ui_MainWindow):
         self.MainWindow = MainWindow
         self.MainWindow.setFixedSize(600, 600)
 
-    def selfService(self):
-        self.MainWindow.setStyleSheet(style)
+    def setMode(self, mode):
+        global settings
+        settings['dark'] = mode
+        writeSettings()
+        if settings['dark']:
+            self.MainWindow.setStyleSheet(darkMode)
+        else:
+            self.MainWindow.setStyleSheet(style)
         self.assignVariables()
+        if self.mode == 2:
+            self.updateFriends()
+
+    def selfService(self):
+        self.mode = 1
+        self.setMode(settings['dark'])
 
         self.MainWindow.closeEvent = self.closeEvent
 
-        self.mode = 1
         self.stackedWidget.setCurrentIndex(0)
         if not session_token:
             self.session = Session()
@@ -147,17 +172,17 @@ class GUI(Ui_MainWindow):
         self.nSwitchIcon = self.groupBox_2.findChild(QLabel, 'label_6')
         self.nSwitchIcon.setScaledContents(True)
 
-        self.groupBox_6.setStyleSheet('background-color: #fff; border: 0px; border-radius: 0px;')
+        self.groupBox_6.setStyleSheet('background-color: #%s; border: 0px; border-radius: 0px;' % ('fff' if not settings['dark'] else '212020'))
         for i in range(4):
             if i == 3:
                 i += 2
             group = self.stackedWidget.findChild(QGroupBox, 'groupBox_%s' % (i + 3))
-            group.setStyleSheet('background-color: #fff; border: 1px solid #dfdfdf; border-radius: 8px;')
+            group.setStyleSheet('background-color: #%s; border: 1px solid #%s; border-radius: 8px;' % (('fff','dfdfdf') if not settings['dark'] else ('1c1b1b','121111')))
 
             if i == 5:
                 i -= 2
             button = self.stackedWidget.findChild(QPushButton, 'pushButton_%s' % (i + 2))
-            button.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px; color: #3c3c3c;')
+            button.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px; color: #%s;' % ('3c3c3c' if not settings['dark'] else 'fff'))
             button.setCursor(QCursor(Qt.PointingHandCursor))
             if i == 0:
                 button.clicked.connect(self.switchMe)
@@ -186,6 +211,9 @@ class GUI(Ui_MainWindow):
         # Settings
         self.toggle = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.toggle.setGeometry(QRect(101,0,60,41))
+
+        self.toggle2 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggle2.setGeometry(QRect(101,41,60,41))
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -244,6 +272,8 @@ class GUI(Ui_MainWindow):
         # Set toggle state
         self.toggle.setChecked(client.running)
         self.toggle.toggled.connect(self.switch)
+        self.toggle2.setChecked(settings['dark'])
+        self.toggle2.toggled.connect(self.setMode)
 
         # Set home
         self.switchMe()
@@ -360,7 +390,7 @@ class GUI(Ui_MainWindow):
 
             friend = client.api.friends[i]
             groupBox = QGroupBox(overlay)
-            groupBox.setStyleSheet('background-color: #fff; border: 1px solid #dfdfdf; border-radius: 8px;')
+            groupBox.setStyleSheet('background-color: #%s; border: 1px solid %s; border-radius: 8px;' % (('fff','#dfdfdf') if not settings['dark'] else ('212020','transparent')))
 
             groupBox.setGeometry(QRect(10 + (j * 91), 0, 81, 111))
             groupBox.setFixedSize(81, 111)
@@ -432,6 +462,11 @@ class SystemTrayApp(QSystemTrayIcon):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
+
+    if os.path.isfile(settingsFile):
+        readSettings()
+    else:
+        writeSettings()
 
     MainWindow = QMainWindow()
     window = GUI(MainWindow)
