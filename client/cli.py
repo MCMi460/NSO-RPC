@@ -67,7 +67,7 @@ class Discord():
             self.rpc.clear()
         # Set GUI
         if self.gui:
-            threading.Thread(target = self.app, args = (self.user,), daemon = True).start()
+            self.app(self.user)
 
     def background(self):
         second = 30

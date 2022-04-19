@@ -100,6 +100,7 @@ def timeSince(epoch:int):
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
 friendTime = time.time()
+iconsStorage = {}
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
@@ -251,7 +252,7 @@ class GUI(Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(1)
 
     def updatePresence(self, user):
-        global friendTime
+        global friendTime, iconsStorage
         def mousePressEvent(event = None):
             pass
         def openLink(url):
@@ -262,13 +263,6 @@ class GUI(Ui_MainWindow):
 
         # If the player is the user
         if user == client.api.user:
-            if time.time() - friendTime >= 60:
-                n = len(client.api.friends)
-                client.api.getFriends()
-                if n != len(client.api.friends):
-                    sys.exit()
-                friendTime = time.time()
-
             text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
             state = ''
         else:
@@ -277,11 +271,15 @@ class GUI(Ui_MainWindow):
                 zone = '%m/%d/%Y'
             elif client.api.userInfo['language'] == 'en-GB':
                 zone = '%d/%m/%Y'
-            text = 'Added Friend at: %s' % time.strftime(zone, time.localtime(user.friendCreatedAt))
+            text = 'When You Became Friends:\n%s' % time.strftime(zone, time.localtime(user.friendCreatedAt))
             state = timeSince(user.presence.logoutAt)
 
         if not user.image:
-            user.image = loadPix(user.imageUri)
+            if not user.nsaId in iconsStorage:
+                user.image = loadPix(user.imageUri)
+                iconsStorage[user.nsaId] = user.image
+            else:
+                user.image = iconsStorage[user.nsaId]
 
         # Set user pic
         self.label_11.setPixmap(user.image)
@@ -316,7 +314,7 @@ class GUI(Ui_MainWindow):
         self.presenceState.adjustSize()
 
     def setFriendIcons(self, layout):
-        global client
+        global client, iconsStorage
         n = 0
         i = 0
         for i in range(layout.count()):
@@ -325,7 +323,9 @@ class GUI(Ui_MainWindow):
                     i = 0
                     for item in items.findChildren(QLabel):
                         if i == 1:
-                            client.api.friends[n].image = loadPix(client.api.friends[n].imageUri)
+                            if not client.api.friends[n].nsaId in iconsStorage:
+                                iconsStorage[client.api.friends[n].nsaId] = loadPix(client.api.friends[n].imageUri)
+                            client.api.friends[n].image = iconsStorage[client.api.friends[n].nsaId]
                             up(item,client.api.friends[n].image)
                         i += 1
                     n += 1
@@ -353,6 +353,7 @@ class GUI(Ui_MainWindow):
             overlay.setFixedSize(81 * 4 + (4 * 10), 111)
             if j == 3:
                 layout.addWidget(overlay)
+                layout.addWidget(QSplitter(Qt.Horizontal))
                 overlay = QGroupBox()
                 n += 1
             j = i % 4
@@ -375,6 +376,8 @@ class GUI(Ui_MainWindow):
 
             groupBox.mousePressEvent = openFriend(i)
             groupBox.setCursor(QCursor(Qt.PointingHandCursor))
+        if j > 0:
+            layout.addWidget(overlay)
         layout.addItem(QSpacerItem(0,600))
 
         page.setLayout(layout)
@@ -390,6 +393,10 @@ class GUI(Ui_MainWindow):
         self.stackedWidget_2.setCurrentIndex(0)
 
     def switchFriends(self):
+        global friendTime
+        if time.time() - friendTime >= 30:
+            self.updateFriends()
+            friendTime = time.time()
         self.stackedWidget_2.setCurrentIndex(1)
 
     def switchSettings(self):

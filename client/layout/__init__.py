@@ -134,7 +134,7 @@ class Ui_MainWindow(object):
         self.label_13.setText("")
         self.label_13.setObjectName("label_13")
         self.label_14 = QtWidgets.QLabel(self.page)
-        self.label_14.setGeometry(QtCore.QRect(140, 60, 231, 31))
+        self.label_14.setGeometry(QtCore.QRect(140, 60, 231, 41))
         self.label_14.setText("")
         self.label_14.setObjectName("label_14")
         self.stackedWidget_2.addWidget(self.page)
