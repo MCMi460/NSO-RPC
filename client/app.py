@@ -436,7 +436,12 @@ if __name__ == '__main__':
     MainWindow = QMainWindow()
     window = GUI(MainWindow)
 
-    tray = SystemTrayApp(QIcon(getPath('icon.png')), MainWindow)
+    iconFile = 'taskbarDark.png'
+    if sys.platform.startswith('darwin'):
+        import subprocess
+        if not bool(subprocess.Popen('defaults read -g AppleInterfaceStyle', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True).communicate()[0]):
+            iconFile = 'taskbarLight.png'
+    tray = SystemTrayApp(QIcon(getPath(iconFile)), MainWindow)
     window.setupUi(MainWindow)
     window.selfService()
 
