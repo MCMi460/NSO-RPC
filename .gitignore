@@ -17,6 +17,7 @@ __pycache__/
 build/
 dist/
 setup.py
+*.spec
 
 # Tests
 test*.*
