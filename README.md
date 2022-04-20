@@ -6,10 +6,14 @@ This README will be split into two sections:
   - [The quickstart guide](#quick)
   - [In-depth guide](#depth)
 
-This project runs using the Nintendo Switch Online Mobile App API.  
-I'd like to thank the [NintendoSwitchRESTAPI](https://github.com/ZekeSnider/NintendoSwitchRESTAPI) developer(s) for very useful blueprint designs.  
-And especially, I'd like to thank [frozenpandaman](https://github.com/frozenpandaman) and his [s2s](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs) API  
-Also, [blackgear](https://github.com/blackgear)'s [NSOnline_API](https://github.com/blackgear/NSOnline_API) was integral to my understanding of `session_token` authentication.
+### Credits
+
+This project uses the Nintendo Switch Online Mobile App API.  
+I'd like to thank:
+- [NintendoSwitchRESTAPI](https://github.com/ZekeSnider/NintendoSwitchRESTAPI) developer(s) (for very useful blueprint designs)
+- [frozenpandaman](https://github.com/frozenpandaman) and his [s2s][s2s] API (he is the reason all of this works)
+- [blackgear](https://github.com/blackgear)'s [NSOnline_API](https://github.com/blackgear/NSOnline_API) (he was integral to my understanding of `session_token` authentication)
+- [qwerty](https://github.com/qwertyquerty) for his [pypresence](https://github.com/qwertyquerty/pypresence)
 
 <h1 id = 'quick'>Quickstart Guide</h1>
 
@@ -38,17 +42,23 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 ***Q: My computer says that this app might have a virus! Does it?***  
 **A:** No. Your computer is saying that because it's a foreign executable file downloaded from the internet, so you should always be cautious about it. If you'd like, you can [build your own `exe`](#building).
 
-***Q: You're not stealing my account, are you?***  
-**A:** Not me, personally. You'll have to ask [frozenpandaman](https://github.com/frozenpandaman) [(s2s)](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs#integration-and-use) and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps. [Read more here](#understanding), and be weary of any possible theft.
+***Q: You're not stealing my account/data, are you?***  
+**A:** Not me, personally. You'll have to ask [frozenpandaman](https://github.com/frozenpandaman) [(s2s)][s2s] and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps. [Read more here](#understanding), and be weary of any possible theft.
+<ul><li><details>
+  <summary><b><i>What if I don't want to use s2s and flapg?</i></b></summary>
+
+  **A**: It is possible to tweak the code and remove the API calls, then instead only use temporary tokens you have provided for authorization headers. However, this is tedious and completely up to the user to perform- as the tokens expire after 7200 seconds (two hours) and are only obtainable through methods such as [mitmproxy](https://github.com/mitmproxy/mitmproxy)
+
+</details></li></ul>
 
 ***Q: Do I need Discord open on my PC to use this application?***  
 **A:** Yes, Discord needs to be open for this application to even run in the first place.
 
 ***Q: I can't get the program to run, what's wrong with it?!***  
-**A:** Run the [cli.py][cli] program and get the error data, then make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
+**A:** Delete the NSO-RPC folder in your Documents folder. If that doesn't work, you should run the [cli.py][cli] program and get the error data, then make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
 
-***Q: I want to switch Nintendo Accounts/I can't link my Nintendo Account. What do I do?***  
-**A:** First, try and delete the NSO-RPC folder in your Documents folder. If it still doesn't work, then refer to the question above.
+***Q: I can't link my Nintendo Account. What do I do?***  
+**A:** Refer to the question above.
 
 *I am not liable for any sort of rate limiting Nintendo may hammer upon your network*
 
@@ -58,26 +68,22 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 
 For Windows, run
 ```bat
-cd client
-python -m pip install -r requirements.txt pyinstaller
-pyinstaller --onefile --clean --noconsole --add-data "icon.png;." --icon=icon.ico app.py
-start dist
+cd .\NSO-RPC\scripts
+.\build.bat
 ```
 For MacOS, run
 ```sh
-cd client
-python3 -m pip install -r requirements.txt py2app
-py2applet --make-setup app.py icon.icns "icon.png"
-python3 setup.py py2app
-open dist
+cd ./NSO-RPC/scripts
+chmod +x build.sh
+./build.sh
 ```
 
 <h2 id = 'understanding'>Understanding</h2>
 
-### Warning: This comprehension guide is outdated as of commit d85286d
-
 This is going to be a detailed explanation on everything that I do here and exactly what is going on. If you're into that sort of stuff, keep reading. If not, feel free to skim and get a general idea of the procedures.  
-I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [GUI (app.py)](/client/app.py).  
+I try my best to be detailed and give a proper comprehensive guide, but I'm not perfect. Feel free to make an [issue](https://github.com/MCMi460/NSO-RPC/issues) if you feel anything in particular should be updated!
+
+I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [GUI (app.py)][app].  
 (You can follow along with the guide [here][api] and [here][cli])
 
 <details>
@@ -182,32 +188,37 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 <details>
   <summary><h3>2. Connecting to Discord</h3></summary>
 
-  We create a `Discord()` object and pass the newly obtained `session_token` to it. This does not involve sending your `session_token` to Discord.  
+  We create a `Discord()` object and pass the newly obtained `session_token` (and `user_lang`) to it. This does not involve sending your `session_token` to Discord.  
   [cli.py][cli]:
   ```python
-  client = Discord(session_token)
+  client = Discord(session_token, user_lang)
   client.background()
   ```
 
   - `Discord().__init__()`:
 
-    First, it creates a `pypresence.Presence()` object (thanks [pypresence](https://github.com/qwertyquerty/pypresence)!) and passes it my Discord Application ID (this has nothing important other than the name 'Nintendo Switch'; you can replace it with your own ID if you want)  
+    First, it creates a `pypresence.Presence()` object and passes it my Discord Application ID (this has nothing important other than the name 'Nintendo Switch'; you can replace it with your own ID if you want)  
     Then, it calls `Discord().connect()` to connect to the Discord client.  
-    We set the `Discord().running` variable to `False`, then if the parameter `session_token` is passed, it will call `Discord().createCTX()`.
+    We set the `Discord().running` and `Discord().gui` variables to `False`, then if the parameters `session_token` and `user_lang` are passed, it will call `Discord().createCTX()`.
     ```python
     self.rpc = pypresence.Presence('637692124539650048')
     self.connect()
     self.running = False
-    if session_token:
-      self.createCTX(session_token)
+    self.api = None
+    self.gui = False
+    if session_token and user_lang:
+      self.createCTX(session_token, user_lang)
     ```
 
   - `Discord().createCTX()`:
 
     This function just creates an `API()` object and sets it to `Discord().api`. It also sets `Discord().running` to `True`.  
-    It requires a `session_token` to be passed.
+    It requires a `session_token` and a `user_lang` to be passed.
     ```python
-    self.api = API(session_token)
+    try:
+      self.api = API(session_token, user_lang)
+    except Exception as e:
+      sys.exit(log(e))
     self.running = True
     ```
 
@@ -217,59 +228,93 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
     ```python
     fails = 0
     while True:
-    # Attempt to connect to Discord. Will wait until it connects
-    try:
-      self.rpc.connect()
-      break
-    except Exception as e:
-      fails += 1
-      if fails > 500:
-        sys.exit('Error, failed after 500 attempts\n\'%s\'' % e)
-      continue
+      # Attempt to connect to Discord. Will wait until it connects
+      try:
+        self.rpc.connect()
+        break
+      except Exception as e:
+        fails += 1
+        if fails > 500:
+          sys.exit(log('Error, failed after 500 attempts\n\'%s\'' % e))
+        continue
+    ```
+
+  - `Discord().setApp()`:
+
+    This is only called by [GUI][app]. All it does is set the usable app function and assign `Discord().gui` to `True`.
+    ```python
+    def setApp(self, function):
+        self.app = function
+        self.gui = True
     ```
 
   - `Discord().update()`:
 
     This updates the user's Discord Rich Presence. Will error if an `API()` object is not defined at `Discord().api`  
-    It basically just calls the API to login to your account, grab the user's info, then if they are not currently offline, it will update the `Discord().rpc`.  
+    It basically just calls the API to grab the user's info, then if they are not currently offline, it will update the `Discord().rpc`.  
+    If it cannot get the user, it will attempt to login.  
     If they are offline, then it will clear their status.  
-    If a `Game().sysDescription` is available, it will display that as the Discord state instead of hours played.
+    If a `Game().sysDescription` is available, it will display that as the Discord state instead of hours played.  
+    If `Discord().gui` is `True`, it will run `Discord().app()`
     ```python
-    def update(self):
-      self.api.updateLogin()
-      self.nickname = self.api.userInfo['nickname']
-      self.user = User(self.api.login.account['result'].get('user'))
+    for i in range(2):
+        try:
+            self.api.getSelf()
+            break
+        except Exception as e:
+            log(e)
+            if i > 0 or time.time() - self.api.login['time'] < 7170:
+                raise Exception('Cannot get session token properly')
+            self.api.updateLogin()
+            continue
+    self.nickname = self.api.userInfo['nickname']
+    self.user = self.api.user
 
-      presence = self.user.presence
-      if presence.state != 'INACTIVE':
+    presence = self.user.presence
+    if presence.game.name: # Please file an issue if this happens to fail
         state = presence.game.sysDescription
         if not state:
-          state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
-          if presence.game.totalPlayTime / 60 < 5:
-            state = 'Played for a little while'
+            state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+            if presence.game.totalPlayTime / 60 < 5:
+                state = 'Played for a little while'
         self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
-      else:
+    else:
         self.rpc.clear()
+    # Set GUI
+    if self.gui:
+        self.app(self.user)
     ```
 
   - `Discord().background()`:
 
-    This is the background task that runs the entire application. What we do here is that we update the user's status once every 60 seconds. And, uh, that's pretty much it. If `Discord().running` is not `True` then it will set the next update to be 5 seconds after `Discord().running` becomes `True` again (whenever you toggle the Discord option in the taskbar, this is what happens).
+    This is the background task that runs the entire application. What we do here is that we update the user's status once every 30 seconds. And, uh, that's pretty much it. If `Discord().running` is not `True` then it will set the next update to be 5 seconds after `Discord().running` becomes `True` again (whenever you toggle the Discord option in the taskbar, this is what happens).
     ```python
-    def background(self):
-      second = 60
-      while True:
+    second = 30
+    while True:
         if self.running:
-          if second == 60:
-            try:
-              self.update()
-            except KeyError:
-              pass
-            second = 0
-          second += 1
+            if second == 30:
+                try:
+                    self.update()
+                except Exception as e:
+                    sys.exit(log(e))
+                second = 0
+            second += 1
         else:
-          second = 55
+            second = 25
         time.sleep(1)
+    ```
+
+  - `Discord().logout()`:
+
+    Removes the configs in the config folder.
+    ```python
+    path = os.path.expanduser('~/Documents/NSO-RPC')
+    if os.path.isfile(os.path.join(path, 'private.txt')):
+        try:os.remove(os.path.join(path, 'private.txt'))
+        except:pass
+        try:os.remove(os.path.join(path, 'settings.txt'))
+        except:pass
+        sys.exit()
     ```
 
 </details>
@@ -284,8 +329,7 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
   - `API()`:
 
-    Has three functions: `API().__init__()`, `API().makeRequest()`, and `API().updateLogin()`.  
-    `API().makeRequest()` is deprecated now, as only `FriendList()` calls it, and `FriendList()` is unused.
+    Has five functions: `API().__init__()`, `API().makeRequest()`, `API().updateLogin()`, `API().getSelf()`, and `API().getFriends()`.  
 
     - `API().__init__()`:
 
@@ -296,11 +340,11 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
       ```
       We also create a GUID (`uuid.uuid4()`)  
       We set the default URL that isn't really used, then we set `API().userInfo` to `UsersMe().get()`, which used in `API().updateLogin()`.  
-      After that, we store the token in plaintext form in your `Documents/NSO-RPC` folder (WHY??? CHANGE THIS!!)
+      After that, we store the token in plaintext form in your `Documents/NSO-RPC` folder. This will likely not be changed as other methods are not really more secure.
 
     - `API().makeRequest()`:
 
-      Deprecated and not in use.
+      Makes a request to `https://api-lp1.znc.srv.nintendo.net` with a route specified.
       ```python
       def makeRequest(self, route):
         return requests.post(self.url + route, headers = self.headers)
@@ -308,21 +352,50 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     - `API().updateLogin()`:
 
-      All this does is create/refresh your `Login()` - and checks to see if your `s2sHash` is older than 2 minutes.  
+      All this does is create/refresh your `Login()`. It will check a file in your `Documents/NSO-RPC` folder for an already existing temporary token so as to prevent excessive calling of the [s2s API][s2s].  
       See `Login()` for more information.
       ```python
-      if time.time() - self.s2sHash['time'] >= 120:
-        self.s2sHash = {
-          'hash': None,
+      path = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
+      if os.path.isfile(path):
+          with open(path, 'rb') as file:
+              self.login = pickle.loads(file.read())
+              self.headers['Authorization'] = 'Bearer %s' % self.login['login'].account['result'].get('webApiServerCredential').get('accessToken')
+              log('Login from file')
+      if time.time() - self.login['time'] < 7170:
+          return
+      login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
+      login.loginToAccount()
+      self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
+      self.login = {
+          'login': login,
           'time': time.time(),
-        }
-      self.login = Login(self.userInfo, self.accessToken, self.guid, self.s2sHash['hash'])
-      self.login.loginToAccount()
+      }
+      with open(path, 'wb') as file:
+          file.write(pickle.dumps(self.login))
+      ```
+
+    - `API().getSelf()`:
+
+      This makes a request for user data and assigns it to the `API().user` variable
+      ```python
+      route = '/v3/User/ShowSelf'
+
+      response = self.makeRequest(route)
+      self.user = User(json.loads(response.text)['result'])
+      ```
+
+    - `API().getFriends()`:
+
+      This makes a `FriendList()` object and calls `FriendList().populateList()`, then assigns `FriendList().friendList` to `API().friends`
+      ```python
+      list = FriendList()
+      list.populateList(self)
+      self.friends = list.friendList
       ```
 
   - `Nintendo()`:
 
-    This just makes an API call to Nintendo for a token. Read more [here](https://github.com/ZekeSnider/NintendoSwitchRESTAPI/blob/master/NintendoAccountBlueprint.md#service-token-connect100apitoken)
+    This just makes an API call to Nintendo for a token. [Read more here](https://github.com/ZekeSnider/NintendoSwitchRESTAPI/blob/master/NintendoAccountBlueprint.md#service-token-connect100apitoken)
 
     - `Nintendo().__init__()`:
 
@@ -348,12 +421,12 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     - `Login().__init__()`:
 
-      Takes `userInfo, accessToken, guid, s2sHash`.  
+      Takes `userInfo, userLang, accessToken, guid`.  
       Sets headers, URL, GUID, user's info, `accessToken`, `Flapg()` API, and the user's account.
 
       Please take extreme caution and note of this piece of code.
       ```python
-      self.flapg = Flapg(self.accessToken, self.timestamp, self.guid, s2sHash).get()
+      self.flapg = Flapg(self.accessToken, self.timestamp, self.guid).get()
       ```
 
     - `Login().loginToAccount()`:
@@ -386,17 +459,13 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     - `Flapg().__init__()`:
 
-      Takes `id_token, timestamp, guid, s2sHash`.
+      Takes `id_token, timestamp, guid`.
       ```python
-      if s2sHash:
-        hash = s2sHash
-      else:
-        hash = s2s(id_token, timestamp).getHash()
       self.headers = {
         'x-token': id_token,
         'x-time': str(timestamp),
         'x-guid': guid,
-        'x-hash': hash,
+        'x-hash': s2s(id_token, timestamp).getHash(),
         'x-ver': '3',
         'x-iid': 'nso',
       }
@@ -417,12 +486,13 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
   - `s2s()`:
 
-    [Learn more about this here](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs)  
+    [Learn more about this here][s2s]  
 
     - `s2s().__init__()`:
 
       Takes `id_token, timestamp`.
       ```python
+      log('Login from Flapg/s2s')
       self.headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': 'NSO-RPC/%s' % version,
@@ -444,7 +514,26 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
   - `FriendList()`:
 
-    This is unused and deprecated, but `FriendList().populateList()` queries the user's friends list and stores it as an array of `Friend()` objects.
+    Creates and stores a list of `Friend()` objects
+
+    - `FriendList().__init__()`:
+
+      Defines route and assigns empty list
+      ```python
+      self.route = '/v3/Friend/List' # Define API route
+
+      self.friendList = [] # List of Friend object(s)
+      ```
+
+    - `FriendList().populateList()`:
+
+      Requires the passing of an `API()` object.  
+      Calls `API().makeRequest()` with `FriendList().route`, then assigns the results as `Friend()` objects to `FriendList().friendList`
+      ```python
+      response = API.makeRequest(self.route)
+      arr = json.loads(response.text)['result']['friends']
+      self.friendList = [ Friend(friend) for friend in arr ]
+      ```
 
   - `User()`:
 
@@ -462,7 +551,11 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
   - `Friend()`:
 
-    An object used in tandem with `FriendList()`. Imagine a retexture of the `User()` class.
+    An object used in tandem with `FriendList()`. Imagine a retexture of the `User()` class, but with the following additions:
+    - `Friend().isFriend`
+    - `Friend().isFavoriteFriend`
+    - `Friend().isServiceUser`
+    - `Friend().friendCreatedAt`
 
   - `Presence()`:
 
@@ -479,9 +572,11 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
   <summary><h3>4. The <code>f</code> token</h3></summary>
 
   This hurts me. This is the reason why we have to call third-party APIs in order to 'login' to Nintendo. It essentially just verifies that you are connecting from a real Nintendo Switch Online Mobile app (ineffectively, obviously).  
-  Since what's required to generate it is potentially incriminating, we have to generate it using third-party APIs (namely [s2s](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs) and [flapg](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs#the-flapg-api)).
+  Since what's required to generate it is potentially incriminating, we have to generate it using third-party APIs (namely [s2s][s2s] and [flapg](https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs#the-flapg-api)).
 
 </details>
 
 [cli]: /client/cli.py
 [api]: /client/api/__init__.py
+[app]: /client/app.py
+[s2s]: https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs
