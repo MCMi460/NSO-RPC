@@ -27,7 +27,11 @@ class Discord():
         self.running = True
 
     def connect(self):
-        self.rpc = pypresence.Presence('637692124539650048')
+        try:
+            self.rpc = pypresence.Presence('637692124539650048')
+        except:
+            self.rpc = None
+            return False
         fails = 0
         while True:
             # Attempt to connect to Discord. Will wait until it connects
