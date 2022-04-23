@@ -4,6 +4,13 @@
 # Please contact me if this fails
 #
 
+function checkDir {
+  if [ ! -d $1 ]
+  then
+    sudo mkdir $1
+  fi
+}
+
 cd ../client
 sudo apt-get install python3-pyqt5
 python3 -m pip install -r requirements.txt
@@ -28,8 +35,16 @@ fi
 sudo cp -a './' $executableDir
 
 # Begin creating .desktop alias
-execFile=$HOME'/Desktop/nsorpc.desktop'
-touch $execFile
+execDir='/usr/share/applications'
+execFile=$execDir'/nsorpc.desktop'
+checkDir $execDir
+sudo touch $execFile
 
-printf $'[Desktop Entry]\nType=Application\nName=Nintendo Switch Online Rich Presence\nGenericName=NSO-RPC\nComment=Display your Nintendo Switch game status on Discord!\nExec=bash -c "cd /opt/NSO-RPC && python3 app.py"\nIcon=icon\nTerminal=false\nCategories=Game;Application;Utility;' > $execFile
-chmod +x $execFile
+iconDir=$HOME'/.icons'
+checkDir $iconDir
+
+sudo cp './icon.svg' $iconDir'/nso.svg'
+
+content="[Desktop Entry]\nType=Application\nName=Nintendo Switch Online Rich Presence\nGenericName=NSO-RPC\nComment=Display your Nintendo Switch game status on Discord!\nExec=bash -c 'cd /opt/NSO-RPC && python3 app.py'\nIcon=${iconDir}/nso.svg\nTerminal=false\nCategories=Game;Application;Utility;"
+printf "$content" | sudo tee $execFile > /dev/null
+sudo chmod +x $execFile
