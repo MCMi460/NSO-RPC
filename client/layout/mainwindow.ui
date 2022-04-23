@@ -459,7 +459,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Update status:</string>
+        <string>Discord:</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_6">
@@ -482,6 +482,19 @@
          <y>50</y>
          <width>101</width>
          <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Update Status:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_16">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>101</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">

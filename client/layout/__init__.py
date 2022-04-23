@@ -162,6 +162,9 @@ class Ui_MainWindow(object):
         self.label_15 = QtWidgets.QLabel(self.page_3)
         self.label_15.setGeometry(QtCore.QRect(10, 50, 101, 21))
         self.label_15.setObjectName("label_15")
+        self.label_16 = QtWidgets.QLabel(self.page_3)
+        self.label_16.setGeometry(QtCore.QRect(10, 80, 101, 41))
+        self.label_16.setObjectName("label_16")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -181,9 +184,10 @@ class Ui_MainWindow(object):
         self.pushButton_5.setText(_translate("MainWindow", "Quit"))
         self.pushButton_4.setText(_translate("MainWindow", "Settings"))
         self.label_9.setText(_translate("MainWindow", "Currently Playing"))
-        self.label_12.setText(_translate("MainWindow", "Update status:"))
+        self.label_12.setText(_translate("MainWindow", "Discord:"))
         self.pushButton_6.setText(_translate("MainWindow", "Logout"))
-        self.label_15.setText(_translate("MainWindow", "Dark Mode:"))
+        self.label_15.setText(_translate("MainWindow", "Update Status:"))
+        self.label_16.setText(_translate("MainWindow", "Dark Mode:"))
 
 
 if __name__ == "__main__":

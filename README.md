@@ -209,13 +209,15 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
     Then, it calls `Discord().connect()` to connect to the Discord client.  
     We set the `Discord().running` and `Discord().gui` variables to `False`, then if the parameters `session_token` and `user_lang` are passed, it will call `Discord().createCTX()`.
     ```python
-    self.rpc = pypresence.Presence('637692124539650048')
-    self.connect()
+    self.rpc = None
+    if rpc:
+        if not self.connect():
+            sys.exit()
     self.running = False
     self.api = None
     self.gui = False
     if session_token and user_lang:
-      self.createCTX(session_token, user_lang)
+        self.createCTX(session_token, user_lang)
     ```
 
   - `Discord().createCTX()`:
@@ -234,6 +236,7 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 
     If this errors over 500 times, the application closes.
     ```python
+    self.rpc = pypresence.Presence('637692124539650048')
     fails = 0
     while True:
       # Attempt to connect to Discord. Will wait until it connects
@@ -246,6 +249,14 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
           sys.exit(log('Error, failed after 500 attempts\n\'%s\'' % e))
         continue
     ```
+    - `Discord().disconnect()`:
+
+      Closes rich presence connection.
+      ```python
+      if self.rpc:
+          self.rpc.close()
+      self.rpc = None
+      ```
 
   - `Discord().setApp()`:
 

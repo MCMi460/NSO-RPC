@@ -8,9 +8,11 @@ import threading
 from api import *
 
 class Discord():
-    def __init__(self, session_token = None, user_lang = None):
-        self.rpc = pypresence.Presence('637692124539650048')
-        self.connect()
+    def __init__(self, session_token = None, user_lang = None, rpc = False):
+        self.rpc = None
+        if rpc:
+            if not self.connect():
+                sys.exit()
         self.running = False
         self.api = None
         self.gui = False
@@ -25,6 +27,7 @@ class Discord():
         self.running = True
 
     def connect(self):
+        self.rpc = pypresence.Presence('637692124539650048')
         fails = 0
         while True:
             # Attempt to connect to Discord. Will wait until it connects
@@ -34,8 +37,16 @@ class Discord():
             except Exception as e:
                 fails += 1
                 if fails > 500:
-                    sys.exit(log('Error, failed after 500 attempts\n\'%s\'' % e))
+                    print(log('Error, failed after 500 attempts\n\'%s\'' % e))
+                    self.rpc = None
+                    return False
                 continue
+        return True
+
+    def disconnect(self):
+        if self.rpc:
+            self.rpc.close()
+        self.rpc = None
 
     def setApp(self, function):
         self.app = function
@@ -56,15 +67,16 @@ class Discord():
         self.user = self.api.user
 
         presence = self.user.presence
-        if presence.game.name: # Please file an issue if this happens to fail
-            state = presence.game.sysDescription
-            if not state:
-                state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
-                if presence.game.totalPlayTime / 60 < 5:
-                    state = 'Played for a little while'
-            self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
-        else:
-            self.rpc.clear()
+        if self.rpc:
+            if presence.game.name: # Please file an issue if this happens to fail
+                state = presence.game.sysDescription
+                if not state:
+                    state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
+                    if presence.game.totalPlayTime / 60 < 5:
+                        state = 'Played for a little while'
+                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
+            else:
+                self.rpc.clear()
         # Set GUI
         if self.gui:
             self.app(self.user)
@@ -123,5 +135,5 @@ if __name__ == '__main__':
     except Exception as e:
         sys.exit(log(e))
 
-    client = Discord(session_token, user_lang)
+    client = Discord(session_token, user_lang, True)
     client.background()

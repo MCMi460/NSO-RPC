@@ -210,10 +210,13 @@ class GUI(Ui_MainWindow):
 
         # Settings
         self.toggle = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle.setGeometry(QRect(101,0,60,41))
+        self.toggle.setGeometry(QRect(101,41,60,41))
 
         self.toggle2 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle2.setGeometry(QRect(101,41,60,41))
+        self.toggle2.setGeometry(QRect(101,82,60,41))
+
+        self.toggle3 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggle3.setGeometry(QRect(101,0,60,41))
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -242,6 +245,7 @@ class GUI(Ui_MainWindow):
         while not client.api:
             pass
         client.setApp(self.updatePresence)
+        client.connect()
         client.update()
 
         # Set user image
@@ -274,6 +278,8 @@ class GUI(Ui_MainWindow):
         self.toggle.toggled.connect(self.switch)
         self.toggle2.setChecked(settings['dark'])
         self.toggle2.toggled.connect(self.setMode)
+        self.toggle3.setChecked(True if client.rpc else False)
+        self.toggle3.toggled.connect(self.toggleConnect)
 
         # Set home
         self.switchMe()
@@ -435,12 +441,24 @@ class GUI(Ui_MainWindow):
     def openPfp(self, event = None):
         webbrowser.open(client.api.user.imageUri)
 
-    def switch(self):
-        client.running = not client.running
+    def switch(self, toggle):
+        client.running = toggle
         if not client.running:
-            client.rpc.clear()
+            if client.rpc:
+                client.rpc.clear()
             client.api.user.presence.game.name = ''
             self.updatePresence(client.api.user)
+
+    def toggleConnect(self, toggle):
+        if not toggle:
+            client.disconnect()
+        else:
+            client.connect()
+            if client.rpc:
+                self.toggle.setChecked(True)
+                client.update()
+            else:
+                self.toggle3.setChecked(False)
 
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):
