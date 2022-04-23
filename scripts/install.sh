@@ -40,11 +40,11 @@ execFile=$execDir'/nsorpc.desktop'
 checkDir $execDir
 sudo touch $execFile
 
-iconDir=$HOME'/.icons'
+iconDir='/usr/share/pixmaps'
 checkDir $iconDir
 
 sudo cp './icon.svg' $iconDir'/nso.svg'
 
-content="[Desktop Entry]\nType=Application\nName=Nintendo Switch Online Rich Presence\nGenericName=NSO-RPC\nComment=Display your Nintendo Switch game status on Discord!\nExec=bash -c 'cd /opt/NSO-RPC && python3 app.py'\nIcon=${iconDir}/nso.svg\nTerminal=false\nCategories=Game;Application;Utility;"
+content="[Desktop Entry]\nType=Application\nName=Nintendo Switch Online Rich Presence\nGenericName=NSO-RPC\nComment=Display your Nintendo Switch game status on Discord!\nExec=bash -c 'cd /opt/NSO-RPC && python3 app.py'\nIcon=nso.svg\nTerminal=false\nCategories=Game;Application;Utility;"
 printf "$content" | sudo tee $execFile > /dev/null
 sudo chmod +x $execFile
