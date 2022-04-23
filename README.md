@@ -77,6 +77,14 @@ cd ./NSO-RPC/scripts
 chmod +x build.sh
 ./build.sh
 ```
+For Linux (Ubuntu), run
+```sh
+cd ./NSO-RPC/scripts
+chmod +x install.sh
+./install.sh
+```
+
+*(Make sure you have `python3` and `pip` installed)
 
 <h2 id = 'understanding'>Understanding</h2>
 
