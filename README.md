@@ -1,3 +1,6 @@
+***Disclaimer: Unfortunately, it appears that Nintendo has removed returning self-Presence in their API as of recently, making this project near obsolete. This is best addressed in issue [#13](https://github.com/MCMi460/NSO-RPC/issues/13), but to summarize: This project will have to undergo major changes (possibly unsavory ones) in order to properly receive the necessary information for a Discord status (namely using a friend account).  
+I'm incredibly sorry for the inconvenience.***
+
 # Nintendo Switch Online Rich Presence
 
 *Display your Nintendo Switch game status on Discord!*
