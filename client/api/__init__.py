@@ -14,7 +14,7 @@ import pickle
 
 client_id = '71b963c1b7b6d119'
 version = 0.2
-nsoAppVersion = '2.0.0'
+nsoAppVersion = '2.1.1'
 languages = [ # ISO Language codes
 'en-US',
 'es-MX',
@@ -40,9 +40,9 @@ def log(info, time = time.time()):
 class API():
     def __init__(self, session_token, user_lang):
         self.headers = {
-            'X-ProductVersion': '2.0.0',
+            'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
-            'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
+            'User-Agent': 'Coral/%s (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4' % nsoAppVersion,
             'Accept': 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
             'Host': 'api-lp1.znc.srv.nintendo.net',
@@ -111,7 +111,7 @@ class API():
 class Nintendo():
     def __init__(self, sessionToken, userLang):
         self.headers = {
-            'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
+            'User-Agent': 'Coral/%s (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4' % nsoAppVersion,
             'Accept': 'application/json',
             'Accept-Language': userLang,
             'Accept-Encoding': 'gzip, deflate',
@@ -132,7 +132,7 @@ class Nintendo():
 class UsersMe():
     def __init__(self, accessToken, userLang):
         self.headers = {
-            'User-Agent': 'Coral/2.0.0 (com.nintendo.znca; build:1489; iOS 15.3.1) Alamofire/5.4.4',
+            'User-Agent': 'Coral/%s (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4' % nsoAppVersion,
             'Accept': 'application/json',
             'Accept-Language': userLang,
             'Authorization': 'Bearer %s' % accessToken,
@@ -192,7 +192,7 @@ class Login():
             'Accept-Language': userLang,
             'User-Agent': 'com.nintendo.znca/' + nsoAppVersion + ' (Android/7.1.2)',
             'Accept': 'application/json',
-            'X-ProductVersion': '2.0.0',
+            'X-ProductVersion': nsoAppVersion,
             'Content-Type': 'application/json; charset=utf-8',
             'Connection': 'Keep-Alive',
             'Authorization': 'Bearer',
