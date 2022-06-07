@@ -38,7 +38,7 @@ def log(info, time = time.time()):
     return info
 
 class API():
-    def __init__(self, session_token, user_lang):
+    def __init__(self, session_token, user_lang, targetID):
         self.headers = {
             'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
@@ -51,6 +51,8 @@ class API():
         }
 
         self.user_lang = user_lang
+        self.session_token = session_token
+        self.targetID = targetID
         self.tokenResponse = Nintendo(session_token, self.user_lang).getServiceToken()
         self.id_token = self.tokenResponse['id_token']
         self.accessToken = self.tokenResponse['access_token']
@@ -71,8 +73,9 @@ class API():
             os.mkdir(path)
         with open(os.path.join(path, 'private.txt'), 'w') as file:
             file.write(json.dumps({
-                'session_token': session_token,
+                'session_token': self.session_token,
                 'user_lang': self.user_lang,
+                'targetID': self.targetID,
             }))
 
     def makeRequest(self, route):
@@ -98,10 +101,17 @@ class API():
             file.write(pickle.dumps(self.login))
 
     def getSelf(self):
-        route = '/v3/User/ShowSelf'
+        if not self.friends:
+            self.getFriends()
 
-        response = self.makeRequest(route)
-        self.user = User(json.loads(response.text)['result'])
+        if not self.targetID:
+            route = '/v3/User/ShowSelf'
+
+            response = self.makeRequest(route)
+            self.user = User(json.loads(response.text)['result'])
+        else:
+            response = next(x for x in self.friends if x.nsaId == self.targetID)
+            self.user = response
 
     def getFriends(self):
         list = FriendList()

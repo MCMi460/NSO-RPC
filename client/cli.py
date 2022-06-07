@@ -8,7 +8,7 @@ import threading
 from api import *
 
 class Discord():
-    def __init__(self, session_token = None, user_lang = None, rpc = False):
+    def __init__(self, session_token = None, user_lang = None, rpc = False, targetID = None):
         self.rpc = None
         if rpc:
             if not self.connect():
@@ -17,11 +17,11 @@ class Discord():
         self.api = None
         self.gui = False
         if session_token and user_lang:
-            self.createCTX(session_token, user_lang)
+            self.createCTX(session_token, user_lang, targetID)
 
-    def createCTX(self, session_token, user_lang):
+    def createCTX(self, session_token, user_lang, targetID = None):
         try:
-            self.api = API(session_token, user_lang)
+            self.api = API(session_token, user_lang, targetID)
         except Exception as e:
             sys.exit(log(e))
         self.running = True
@@ -59,6 +59,18 @@ class Discord():
     def update(self):
         for i in range(2):
             try:
+                if not self.api.targetID and not self.gui:
+                    if not self.api.friends:
+                        self.api.getFriends()
+                    self.api.targetID = input('Which user are you?\n-----\n%s\n-----\nPlease enter the ID here: ' % '\n-----\n'.join([ '%s (%s)' % (x.name, x.nsaId) for x in client.api.friends]))
+                    if not self.api.targetID in (x.nsaId for x in client.api.friends):
+                        sys.exit(log('Unknown ID input by user'))
+                    with open(os.path.join(os.path.expanduser('~/Documents/NSO-RPC'), 'private.txt'), 'w') as file:
+                        file.write(json.dumps({
+                            'session_token': self.api.session_token,
+                            'user_lang': self.api.user_lang,
+                            'targetID': self.api.targetID,
+                        }))
                 self.api.getSelf()
                 break
             except Exception as e:
@@ -67,7 +79,6 @@ class Discord():
                     raise Exception('Cannot get session token properly')
                 self.api.updateLogin()
                 continue
-        self.nickname = self.api.userInfo['nickname']
         self.user = self.api.user
 
         presence = self.user.presence
@@ -110,13 +121,14 @@ class Discord():
             sys.exit()
 
 def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/private.txt')):
-    session_token, user_lang = None, None
+    session_token, user_lang, targetID = None, None, None
     if os.path.isfile(path):
         with open(path, 'r') as file:
             try:
                 data = json.loads(file.read())
                 session_token = data['session_token']
                 user_lang = data['user_lang']
+                targetID = data['targetID']
                 if not user_lang in languages:
                     raise Exception('invalid user language')
             except Exception as e:
@@ -131,13 +143,13 @@ def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/p
     tempToken = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
     if not os.path.isfile(path) and os.path.isfile(tempToken):
         os.remove(tempToken)
-    return session_token, user_lang
+    return session_token, user_lang, targetID
 
 if __name__ == '__main__':
     try:
-        session_token, user_lang = getToken()
+        session_token, user_lang, targetID = getToken()
     except Exception as e:
         sys.exit(log(e))
 
-    client = Discord(session_token, user_lang, True)
+    client = Discord(session_token, user_lang, True, targetID)
     client.background()

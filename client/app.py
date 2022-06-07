@@ -12,8 +12,8 @@ from qtwidgets import Toggle, AnimatedToggle
 from cli import *
 
 # NSO Variables
-session_token, user_lang = getToken(False)
-client = Discord(session_token, user_lang)
+session_token, user_lang, targetID = getToken(False)
+client = Discord(session_token, user_lang, False, targetID)
 # PyQt5 Variables
 style = """
 QWidget {
@@ -44,6 +44,9 @@ QPushButton {
   background-color: #e60012;
   border-radius: 10px;
   text-align: center;
+}
+QPushButton:disabled {
+  background-color: #706465;
 }
 QScrollBar:vertical {
     border: 0px;
@@ -104,6 +107,7 @@ settingsFile = os.path.expanduser('~/Documents/NSO-RPC/settings.txt')
 settings = {
     'dark': False,
 }
+userSelected = ''
 def writeSettings():
     try:os.mkdir(os.path.dirname(settingsFile))
     except:pass
@@ -161,6 +165,11 @@ class GUI(Ui_MainWindow):
         self.selfImage.setScaledContents(True)
         self.selfImage.setCursor(QCursor(Qt.PointingHandCursor))
         self.selfImage.mousePressEvent = self.openPfp
+
+        self.pushButton_7.setCursor(QCursor(Qt.PointingHandCursor))
+        self.pushButton_8.setCursor(QCursor(Qt.PointingHandCursor))
+        self.pushButton_7.clicked.connect(lambda *args:self.updateProfile(True))
+        self.pushButton_8.clicked.connect(lambda *args:self.updateProfile(False))
 
         self.namePlate = self.stackedWidget.findChild(QLabel, 'label_4')
         self.namePlate.setAlignment(Qt.AlignCenter)
@@ -226,7 +235,7 @@ class GUI(Ui_MainWindow):
         tray.show()
 
     def grabToken(self):
-        global session_token, user_lang
+        global session_token, user_lang, targetID
         try:
             session_token = self.session.run(*self.session.login(self.waitUntil))
             user_lang = self.comboBox.currentText()
@@ -288,7 +297,7 @@ class GUI(Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(1)
 
     def updatePresence(self, user):
-        global friendTime, iconsStorage
+        global friendTime, iconsStorage, userSelected
         def mousePressEvent(event = None):
             pass
         def openLink(url):
@@ -298,10 +307,12 @@ class GUI(Ui_MainWindow):
             return lambda event : e(event)
 
         # If the player is the user
-        if user == client.api.user:
+        try:
             text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
             state = ''
-        else:
+            self.pushButton_7.setEnabled(False)
+            self.pushButton_8.setEnabled(False)
+        except:
             zone = '%Y/%m/%d'
             if client.api.userInfo['language'] == 'en-US':
                 zone = '%m/%d/%Y'
@@ -309,6 +320,11 @@ class GUI(Ui_MainWindow):
                 zone = '%d/%m/%Y'
             text = 'When You Became Friends:\n%s' % time.strftime(zone, time.localtime(user.friendCreatedAt))
             state = timeSince(user.presence.logoutAt)
+            self.pushButton_7.setEnabled(True)
+            self.pushButton_8.setEnabled(True)
+
+        if user == client.api.user:
+            self.pushButton_7.setEnabled(False)
 
         if not user.image:
             if not user.nsaId in iconsStorage:
@@ -348,6 +364,24 @@ class GUI(Ui_MainWindow):
             self.groupBox_7.mousePressEvent = mousePressEvent
         self.presenceState.setText(state)
         self.presenceState.adjustSize()
+
+        userSelected = user.nsaId
+
+    def updateProfile(self, new):
+        if new:
+            client.api.targetID = userSelected
+        else:
+            client.api.targetID = None
+        with open(os.path.join(os.path.expanduser('~/Documents/NSO-RPC'), 'private.txt'), 'w') as file:
+            file.write(json.dumps({
+                'session_token': client.api.session_token,
+                'user_lang': client.api.user_lang,
+                'targetID': client.api.targetID,
+            }))
+        dlg = QMessageBox()
+        dlg.setWindowTitle('NSO-RPC')
+        dlg.setText('You will need to restart the application in order for the changes to take place.\nSorry for the inconvenience.')
+        sys.exit(dlg.exec_())
 
     def setFriendIcons(self, layout):
         global client, iconsStorage
