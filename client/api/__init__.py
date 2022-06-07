@@ -101,8 +101,7 @@ class API():
             file.write(pickle.dumps(self.login))
 
     def getSelf(self):
-        if not self.friends:
-            self.getFriends()
+        self.getFriends()
 
         if not self.targetID:
             route = '/v3/User/ShowSelf'
