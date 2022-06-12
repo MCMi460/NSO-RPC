@@ -446,7 +446,7 @@ class GUI(Ui_MainWindow):
 
             groupBox.mousePressEvent = openFriend(i)
             groupBox.setCursor(QCursor(Qt.PointingHandCursor))
-        if j > 0:
+        if j >= 0:
             layout.addWidget(overlay)
         layout.addItem(QSpacerItem(0,600))
 
