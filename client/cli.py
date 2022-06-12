@@ -86,7 +86,7 @@ class Discord():
 
         presence = self.user.presence
         if self.rpc:
-            if presence.game.name and presence.state == 'ONLINE': # Please file an issue if this happens to fail
+            if presence.game.name: # Please file an issue if this happens to fail
                 if self.currentGame != presence.game.name:
                     self.currentGame = presence.game.name
                     self.start = int(time.time())
