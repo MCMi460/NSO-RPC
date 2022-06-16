@@ -447,7 +447,11 @@ class GUI(Ui_MainWindow):
             groupBox.mousePressEvent = openFriend(i)
             groupBox.setCursor(QCursor(Qt.PointingHandCursor))
         if j >= 0:
+            overlay.move(0, 0)
+            overlay.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px;')
+            overlay.setFixedSize(81 * 4 + (4 * 10), 111)
             layout.addWidget(overlay)
+            layout.addWidget(QSplitter(Qt.Horizontal))
         layout.addItem(QSpacerItem(0,600))
 
         page.setLayout(layout)
