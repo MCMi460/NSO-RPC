@@ -19,6 +19,9 @@ class Discord():
         if session_token and user_lang:
             self.createCTX(session_token, user_lang, targetID)
 
+        self.currentGame = None
+        self.start = int(time.time())
+
     def createCTX(self, session_token, user_lang, targetID = None):
         try:
             self.api = API(session_token, user_lang, targetID)
@@ -84,13 +87,17 @@ class Discord():
         presence = self.user.presence
         if self.rpc:
             if presence.game.name: # Please file an issue if this happens to fail
+                if self.currentGame != presence.game.name:
+                    self.currentGame = presence.game.name
+                    self.start = int(time.time())
                 state = presence.game.sysDescription
                 if not state:
                     state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
                     if presence.game.totalPlayTime / 60 < 5:
                         state = 'Played for a little while'
-                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state)
+                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start)
             else:
+                self.currentGame = None
                 self.rpc.clear()
         # Set GUI
         if self.gui:
