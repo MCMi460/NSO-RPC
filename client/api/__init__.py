@@ -81,6 +81,12 @@ class API():
     def makeRequest(self, route):
         return requests.post(self.url + route, headers = self.headers)
 
+    def refreshAccessToken(self):
+        self.tokenResponse = Nintendo(self.session_token, self.user_lang).getServiceToken()
+        self.id_token = self.tokenResponse['id_token']
+        self.accessToken = self.tokenResponse['access_token']
+        return self.accessToken
+
     def updateLogin(self):
         path = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
         if os.path.isfile(path):
@@ -90,7 +96,7 @@ class API():
                 log('Login from file')
         if time.time() - self.login['time'] < 7170:
             return
-        login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
+        login = Login(self.userInfo, self.user_lang, self.refreshAccessToken(), self.guid)
         login.loginToAccount()
         self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
         self.login = {
