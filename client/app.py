@@ -515,7 +515,7 @@ class SystemTrayApp(QSystemTrayIcon):
         tray.hide()
         MainWindow.show()
 
-    def windowsDarkMode(): #https://stackoverflow.com/a/65349866
+    def windowsLightMode(): #https://stackoverflow.com/a/65349866
         try:
             import winreg
         except ImportError:
@@ -554,7 +554,7 @@ if __name__ == '__main__':
         if not bool(subprocess.Popen('defaults read -g AppleInterfaceStyle', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True).communicate()[0]):
             iconFile = 'taskbarLight.png'
     if sys.platform.startswith('win'):
-        if not bool(SystemTrayApp.windowsDarkMode()):
+        if not bool(SystemTrayApp.windowsLightMode()):
             iconFile = 'taskBarLight.png'
     tray = SystemTrayApp(QIcon(getPath(iconFile)), MainWindow)
     window.setupUi(MainWindow)
