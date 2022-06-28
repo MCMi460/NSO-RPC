@@ -14,6 +14,8 @@ I'd like to thank:
 - [frozenpandaman](https://github.com/frozenpandaman) and his [s2s][s2s] API (he is the reason all of this works)
 - [blackgear](https://github.com/blackgear)'s [NSOnline_API](https://github.com/blackgear/NSOnline_API) (he was integral to my understanding of `session_token` authentication)
 - [qwerty](https://github.com/qwertyquerty) for his [pypresence](https://github.com/qwertyquerty/pypresence)
+- [samuelthomas2774](https://github.com/samuelthomas2774) for the tremendous amounts of help he provides to this project's issues. Check out his [nxapi here](https://github.com/samuelthomas2774/nxapi)!
+- [anthonybaldwin](https://github.com/anthonybaldwin) for being awesome and helping out this project a ton!
 
 <h1 id = 'quick'>Quickstart Guide</h1>
 
