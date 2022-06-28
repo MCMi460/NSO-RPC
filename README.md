@@ -1,6 +1,3 @@
-***Disclaimer: Unfortunately, it appears that Nintendo has removed returning self-Presence in their API as of recently, making this project near obsolete. This is best addressed in issue [#13](https://github.com/MCMi460/NSO-RPC/issues/13), but to summarize: This project will have to undergo major changes (possibly unsavory ones) in order to properly receive the necessary information for a Discord status (namely using a friend account).  
-I'm incredibly sorry for the inconvenience.***
-
 # Nintendo Switch Online Rich Presence
 
 *Display your Nintendo Switch game status on Discord!*
@@ -23,7 +20,9 @@ I'd like to thank:
 Download the app from the [latest release](https://github.com/MCMi460/NSO-RPC/releases) and run!  
 Once ran, the app will ask for you to log into your Nintendo account on a web browser. There is no malicious code with intent to steal your information, but it's best to [review the code][api] for yourself.
 
-1. Open Discord first, then NSO-RPC
+1. Open Discord and NSO-RPC
+
+  - You will need a secondary account that is friended with your account in order to "Target" the intended profile's presence. Due to changes in Nintendo's API ([#13](https://github.com/MCMi460/NSO-RPC/issues/13)), it is impossible to return a user's self presence, and instead can only send a user's friend list. Therefore, we have implemented a workaround to "Target" other users to provide rich presence information.
 
 2. Log in to your Nintendo account when prompted
 
@@ -33,7 +32,7 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 
 4. Paste the link in the pop-up's form and click 'Log In'
 
-5. Control your rich presence from the system tray icon
+5. Control your rich presence from the app and system tray icon
 
 ![display](/resources/display.png)
 
