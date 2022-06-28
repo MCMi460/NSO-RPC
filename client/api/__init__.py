@@ -53,9 +53,7 @@ class API():
         self.user_lang = user_lang
         self.session_token = session_token
         self.targetID = targetID
-        self.tokenResponse = Nintendo(session_token, self.user_lang).getServiceToken()
-        self.id_token = self.tokenResponse['id_token']
-        self.accessToken = self.tokenResponse['access_token']
+        self.refreshAccessToken()
         self.guid = str(uuid.uuid4())
 
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
