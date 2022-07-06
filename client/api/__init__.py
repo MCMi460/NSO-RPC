@@ -12,9 +12,14 @@ import hashlib
 import re
 import pickle
 
+def getVersion():
+    r = requests.get('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557')
+    searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
+    return searchPattern.findall(r.text)
+
 client_id = '71b963c1b7b6d119'
 version = 0.2
-nsoAppVersion = '2.1.1'
+nsoAppVersion = getVersion()[0]
 languages = [ # ISO Language codes
 'en-US',
 'es-MX',
@@ -346,6 +351,7 @@ class Session():
         response = self.Session.get(url, headers = self.headers, params = params)
 
         webbrowser.open(response.history[0].url)
+        print('Open this link: %s' % response.history[0].url)
         tokenPattern = re.compile(r'(eyJhbGciOiJIUzI1NiJ9\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*)')
         code = tokenPattern.findall(receiveInput())[0]
 
