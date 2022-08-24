@@ -12,13 +12,26 @@ import hashlib
 import re
 import pickle
 
+def log(info, time = time.time()):
+    path = os.path.expanduser('~/Documents/NSO-RPC')
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    with open(os.path.join(path, 'logs.txt'), 'a') as file:
+        file.write('%s: %s\n' % (time, info))
+    return info
+
 def getVersion():
-    r = requests.get('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557')
+    for i in range(5):
+        try:
+            r = requests.get('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557', timeout = 10)
+            break
+        except:
+            log('Failed to get Apple\'s store page. Retrying...')
     searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
     return searchPattern.findall(r.text)
 
 client_id = '71b963c1b7b6d119'
-version = 0.2
+version = 0.3
 nsoAppVersion = getVersion()[0]
 languages = [ # ISO Language codes
 'en-US',
@@ -33,14 +46,6 @@ languages = [ # ISO Language codes
 'nl-NL',
 'ru-RU'
 ]
-
-def log(info, time = time.time()):
-    path = os.path.expanduser('~/Documents/NSO-RPC')
-    if not os.path.isdir(path):
-        os.mkdir(path)
-    with open(os.path.join(path, 'logs.txt'), 'a') as file:
-        file.write('%s: %s\n' % (time, info))
-    return info
 
 class API():
     def __init__(self, session_token, user_lang, targetID):
@@ -88,6 +93,7 @@ class API():
         self.tokenResponse = Nintendo(self.session_token, self.user_lang).getServiceToken()
         self.id_token = self.tokenResponse['id_token']
         self.accessToken = self.tokenResponse['access_token']
+        self.refreshLast = time.time()
         return self.accessToken
 
     def updateLogin(self):
@@ -99,7 +105,9 @@ class API():
                 log('Login from file')
         if time.time() - self.login['time'] < 7170:
             return
-        login = Login(self.userInfo, self.user_lang, self.refreshAccessToken(), self.guid)
+        if time.time() - self.refreshLast > 120:
+            self.refreshAccessToken()
+        login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
         login.loginToAccount()
         self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
         self.login = {
@@ -166,42 +174,26 @@ class UsersMe():
         response = requests.get(self.url + route, headers = self.headers)
         return json.loads(response.text)
 
-class s2s():
-    def __init__(self, id_token, timestamp):
-        log('Login from Flapg/s2s')
+class imink():
+    def __init__(self, id_token, timestamp, guid, iteration):
         self.headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'NSO-RPC/%s' % version,
+            'Content-Type': 'application/json; charset=utf-8',
         }
         self.body = {
-            'naIdToken': id_token,
-            'timestamp': timestamp,
-        }
-        self.url = 'https://elifessler.com'
-
-    def getHash(self):
-        route = '/s2s/api/gen2'
-        response = requests.post(self.url + route, headers = self.headers, data = self.body)
-        return json.loads(response.text)['hash']
-
-class Flapg():
-    def __init__(self, id_token, timestamp, guid):
-        self.headers = {
-            'x-token': id_token,
-            'x-time': str(timestamp),
-            'x-guid': guid,
-            'x-hash': s2s(id_token, timestamp).getHash(),
-            'x-ver': '3',
-            'x-iid': 'nso',
+            'token': id_token,
+            'hashMethod': str(iteration),
+            'timestamp': str(timestamp),
+            'request_id': guid,
         }
 
-        self.url = 'https://flapg.com'
+        self.url = 'https://api.imink.app'
 
     def get(self):
-        route = '/ika2/api/login?public'
+        route = '/f'
 
-        response = requests.get(self.url + route, headers = self.headers)
-        return json.loads(response.text)['result']
+        response = requests.post(self.url + route, headers = self.headers, data = json.dumps(self.body))
+        return json.loads(response.text)
 
 class Login():
     def __init__(self, userInfo, userLang, accessToken, guid):
@@ -219,24 +211,26 @@ class Login():
         }
 
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
-        self.timestamp = int(time.time())
+        self.timestamp = int(time.time()) * 1000 # Convert from iOS to Android
         self.guid = guid
 
         self.userInfo = userInfo
         self.accessToken = accessToken
 
-        self.flapg = Flapg(self.accessToken, self.timestamp, self.guid).get()
+        self.imink = imink(self.accessToken, self.timestamp, self.guid, 1).get()
+        self.timestamp = int(self.imink['timestamp'])
+        self.guid = self.imink['request_id']
 
         self.account = None
 
     def loginToAccount(self):
-        route = '/v3/Account/Login'
+        route = '/v2/Account/Login'
         body = {
             'parameter': {
-                'f': self.flapg['f'],
-                'naIdToken': self.flapg['p1'],
-                'timestamp': self.flapg['p2'],
-                'requestId': self.flapg['p3'],
+                'f': self.imink['f'],
+                'naIdToken': self.accessToken,
+                'timestamp': self.timestamp,
+                'requestId': self.guid,
                 'naCountry': self.userInfo['country'],
                 'naBirthday': self.userInfo['birthday'],
                 'language': self.userInfo['language'],
