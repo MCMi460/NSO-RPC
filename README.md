@@ -12,6 +12,7 @@ This project uses the Nintendo Switch Online Mobile App API.
 I'd like to thank:
 - [NintendoSwitchRESTAPI](https://github.com/ZekeSnider/NintendoSwitchRESTAPI) developer(s) (for very useful blueprint designs)
 - [frozenpandaman](https://github.com/frozenpandaman) and his [s2s][s2s] API (he is the reason all of this works)
+- [JoneWang](https://github.com/JoneWang) and his [imink][imink] API. He is crucial to some of the authentication steps performed
 - [blackgear](https://github.com/blackgear)'s [NSOnline_API](https://github.com/blackgear/NSOnline_API) (he was integral to my understanding of `session_token` authentication)
 - [qwerty](https://github.com/qwertyquerty) for his [pypresence](https://github.com/qwertyquerty/pypresence)
 - [samuelthomas2774](https://github.com/samuelthomas2774) for the tremendous amounts of help he provides to this project's issues. Check out his [nxapi here](https://github.com/samuelthomas2774/nxapi)!
@@ -40,6 +41,8 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 
 ## FAQ
 
+> If none of the below Qs and As help with your problem, feel free to [file an issue](https://github.com/MCMi460/NSO-RPC/issues/new). Alternatively, you can join the [NSO-RPC Discord server](https://discord.gg/pwFASr2NKx) for a better back-and-forth method of communication with me!
+
 ***Q: Do you need a Nintendo Switch Online subscription to use this app?***  
 **A:** No, you do not. This app works whether or not you have access to online services. You will, however, need to link your Nintendo account to your user profile on your Switch.
 
@@ -47,16 +50,16 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 **A:** No. Your computer is saying that because it's a foreign executable file downloaded from the internet, so you should always be cautious about it. If you'd like, you can [build your own `exe`](#building).
 
 ***Q: You're not stealing my account/data, are you?***  
-**A:** Not me, personally. You'll have to ask [frozenpandaman](https://github.com/frozenpandaman) [(s2s)][s2s] and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps. [Read more here](#understanding), and be weary of any possible theft.
+**A:** ~~Not me, personally. You'll have to ask [frozenpandaman](https://github.com/frozenpandaman) [(s2s)][s2s] and [@NexusMine (flapg)](https://twitter.com/NexusMine). They are responsible for some of the authentication steps.~~ This project now uses [imink API][imink] to provide for some authentication steps. [Read more here](#understanding), and be weary of any possible theft.
 <ul><li><details>
-  <summary><b><i>What if I don't want to use s2s and flapg?</i></b></summary>
+  <summary><b><i>What if I don't want to use imink?</i></b></summary>
 
   **A**: It is possible to tweak the code and remove the API calls, then instead only use temporary tokens you have provided for authorization headers. However, this is tedious and completely up to the user to perform- as the tokens expire after 7200 seconds (two hours) and are only obtainable through methods such as [mitmproxy](https://github.com/mitmproxy/mitmproxy)
 
 </details></li></ul>
 
 ***Q: Do I need Discord open on my PC to use this application?***  
-**A:** Yes, Discord needs to be open for this application to even run in the first place.
+**A:** No. Discord only needs to be open for the rich presence to be active.
 
 ***Q: I can't get the program to run, what's wrong with it?!***  
 **A:** Delete the NSO-RPC folder in your Documents folder. If that doesn't work, you should run the [cli.py][cli] program and get the error data, then make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
@@ -96,7 +99,9 @@ This is going to be a detailed explanation on everything that I do here and exac
 I try my best to be detailed and give a proper comprehensive guide, but I'm not perfect. Feel free to make an [issue](https://github.com/MCMi460/NSO-RPC/issues) if you feel anything in particular should be updated!
 
 I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [GUI (app.py)][app].  
-(You can follow along with the guide [here][api] and [here][cli])
+(You can follow along with the guide [here][api] and [here][cli])  
+
+**As of [8abf86c](https://github.com/MCMi460/NSO-RPC/commit/8abf86c6f4dca2d5cde7bf0886de6f1642b6dbef), this guide is outdated in regards to the APIs used.**
 
 <details>
   <summary><h3>1. Getting your <code>session_token</code></h3></summary>
@@ -603,3 +608,4 @@ I'm going to be explaining my [cli.py][cli] as it isn't as complicated as the [G
 [api]: /client/api/__init__.py
 [app]: /client/app.py
 [s2s]: https://github.com/frozenpandaman/splatnet2statink/wiki/api-docs
+[imink]: https://github.com/JoneWang/imink
