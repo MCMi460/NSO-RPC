@@ -12,7 +12,7 @@ class Discord():
         self.rpc = None
         if rpc:
             if not self.connect():
-                sys.exit()
+                sys.exit("Failed to connect to Discord")
         self.running = False
         self.api = None
         self.gui = False
