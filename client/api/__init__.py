@@ -28,11 +28,15 @@ def getVersion():
         except:
             log('Failed to get Apple\'s store page. Retrying...')
     searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
-    return searchPattern.findall(r.text)
+    version = searchPattern.findall(r.text)[0]
+    pattern = re.compile(r'(\d.\d.\d)')
+    if not re.search(pattern, version):
+        return ''
+    return version
 
 client_id = '71b963c1b7b6d119'
 version = 0.3
-nsoAppVersion = getVersion()[0]
+nsoAppVersion = None
 languages = [ # ISO Language codes
 'en-US',
 'es-MX',
@@ -48,7 +52,12 @@ languages = [ # ISO Language codes
 ]
 
 class API():
-    def __init__(self, session_token, user_lang, targetID):
+    def __init__(self, session_token, user_lang, targetID, version):
+        pattern = re.compile(r'(\d.\d.\d)')
+        if not version or not re.search(pattern, version):
+            raise Exception('missing app version')
+        global nsoAppVersion
+        nsoAppVersion = version
         self.headers = {
             'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
@@ -190,6 +199,7 @@ class imink():
         self.url = 'https://api.imink.app'
 
     def get(self):
+        log('Login from imink')
         route = '/f'
 
         response = requests.post(self.url + route, headers = self.headers, data = json.dumps(self.body))

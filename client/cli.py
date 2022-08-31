@@ -8,7 +8,7 @@ import threading
 from api import *
 
 class Discord():
-    def __init__(self, session_token = None, user_lang = None, rpc = False, targetID = None):
+    def __init__(self, session_token = None, user_lang = None, rpc = False, targetID = None, version = None):
         self.rpc = None
         if rpc:
             if not self.connect():
@@ -17,14 +17,18 @@ class Discord():
         self.api = None
         self.gui = False
         if session_token and user_lang:
-            self.createCTX(session_token, user_lang, targetID)
+            self.createCTX(session_token, user_lang, targetID, version)
 
         self.currentGame = None
         self.start = int(time.time())
 
-    def createCTX(self, session_token, user_lang, targetID = None):
+    def createCTX(self, session_token, user_lang, targetID = None, version = None):
         try:
-            self.api = API(session_token, user_lang, targetID)
+            if not version:
+                version = getVersion()
+                if not version:
+                    version = input('What is the current version of the Nintendo Switch Online Mobile app? The App Store says it is %s (Please enter like X.X.X)\n> ' % version)
+            self.api = API(session_token, user_lang, targetID, version)
         except Exception as e:
             sys.exit(log(e))
         self.running = True

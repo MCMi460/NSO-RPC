@@ -11,9 +11,16 @@ import time
 from qtwidgets import Toggle, AnimatedToggle
 from cli import *
 
+# PyQt5 Initialization
+app = QApplication(sys.argv)
+app.setQuitOnLastWindowClosed(False)
+MainWindow = QMainWindow()
 # NSO Variables
 session_token, user_lang, targetID = getToken(False)
-client = Discord(session_token, user_lang, False, targetID)
+version = getVersion()
+while not version:
+    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)' % version)
+client = Discord(session_token, user_lang, False, targetID, version)
 # PyQt5 Variables
 style = """
 QWidget {
@@ -239,7 +246,7 @@ class GUI(Ui_MainWindow):
         try:
             session_token = self.session.run(*self.session.login(self.waitUntil))
             user_lang = self.comboBox.currentText()
-            client.createCTX(session_token, user_lang)
+            client.createCTX(session_token, user_lang, None, version)
         except Exception as e:
             print(log(f'An error occurred! Chances are, you didn\'t paste the right link, but here\'s the error message:\n{e}'))
             os._exit(1)
@@ -537,15 +544,11 @@ class SystemTrayApp(QSystemTrayIcon):
         return False
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
-
     if os.path.isfile(settingsFile):
         readSettings()
     else:
         writeSettings()
 
-    MainWindow = QMainWindow()
     window = GUI(MainWindow)
 
     iconFile = 'taskbarDark.png'
