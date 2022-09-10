@@ -99,7 +99,7 @@ class Discord():
                     state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
                     if presence.game.totalPlayTime / 60 < 5:
                         state = 'Played for a little while'
-                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start)
+                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start, buttons = [{'label': 'Nintendo eShop', 'url': presence.game.shopUri},])
             else:
                 self.currentGame = None
                 self.rpc.clear()
