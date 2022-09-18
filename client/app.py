@@ -20,7 +20,11 @@ session_token, user_lang, targetID = getToken(False)
 version = getVersion()
 while not version:
     version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)' % version)
-client = Discord(session_token, user_lang, False, targetID, version)
+try:
+    client = Discord(session_token, user_lang, False, targetID, version)
+except Exception as e:
+    log(e)
+    raise e
 # PyQt5 Variables
 style = """
 QWidget {
@@ -260,9 +264,13 @@ class GUI(Ui_MainWindow):
         self.mode = 2
         while not client.api:
             pass
-        client.setApp(self.updatePresence)
-        client.connect()
-        client.update()
+        try:
+            client.setApp(self.updatePresence)
+            client.connect()
+            client.update()
+        except Exception as e:
+            log(e)
+            raise e
 
         # Set user image
         client.api.user.image = loadPix(client.api.user.imageUri)
@@ -563,7 +571,14 @@ if __name__ == '__main__':
     window.setupUi(MainWindow)
     window.selfService()
 
-    threading.Thread(target = client.background, daemon = True).start()
+    def clientBackgroundCatcher():
+        try:
+            client.background()
+        except Exception as e:
+            log(e)
+            raise e
+
+    threading.Thread(target = clientBackgroundCatcher, daemon = True).start()
 
     MainWindow.show()
 

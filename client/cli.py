@@ -162,5 +162,9 @@ if __name__ == '__main__':
     except Exception as e:
         sys.exit(log(e))
 
-    client = Discord(session_token, user_lang, True, targetID)
-    client.background()
+    try:
+        client = Discord(session_token, user_lang, True, targetID)
+        client.background()
+    except Exception as e:
+        log(e)
+        raise e

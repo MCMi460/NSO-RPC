@@ -110,7 +110,10 @@ class API():
         if os.path.isfile(path):
             with open(path, 'rb') as file:
                 self.login = pickle.loads(file.read())
-                self.headers['Authorization'] = 'Bearer %s' % self.login['login'].account['result'].get('webApiServerCredential').get('accessToken')
+                try:
+                    self.headers['Authorization'] = 'Bearer %s' % self.login['login'].account['result'].get('webApiServerCredential').get('accessToken')
+                except Exception as e:
+                    raise Exception('Failure with authorization: %s\nLogin returns %s' % (e, self.login['login'].account))
                 log('Login from file')
         if time.time() - self.login['time'] < 7170:
             return
@@ -118,7 +121,10 @@ class API():
             self.refreshAccessToken()
         login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
         login.loginToAccount()
-        self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
+        try:
+            self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
+        except Exception as e:
+            raise Exception('Failure with authorization: %s\nLogin returns %s' % (e, login.account))
         self.login = {
             'login': login,
             'time': time.time(),
@@ -192,8 +198,6 @@ class imink():
         self.body = {
             'token': id_token,
             'hashMethod': str(iteration),
-            'timestamp': str(timestamp),
-            'request_id': guid,
         }
 
         self.url = 'https://api.imink.app'
@@ -234,7 +238,7 @@ class Login():
         self.account = None
 
     def loginToAccount(self):
-        route = '/v2/Account/Login'
+        route = '/v3/Account/Login'
         body = {
             'parameter': {
                 'f': self.imink['f'],
