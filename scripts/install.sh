@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # This is intended for Ubuntu Linux
 # although it may work for other distributions
