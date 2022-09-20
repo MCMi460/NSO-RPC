@@ -113,7 +113,8 @@ class API():
                 try:
                     self.headers['Authorization'] = 'Bearer %s' % self.login['login'].account['result'].get('webApiServerCredential').get('accessToken')
                 except Exception as e:
-                    raise Exception('Failure with authorization: %s\nLogin returns %s' % (e, self.login['login'].account))
+                    log('Failure with authorization: %s\nLogin returns %s' % (e, self.login['login'].account))
+                    raise e
                 log('Login from file')
         if time.time() - self.login['time'] < 7170:
             return
@@ -298,7 +299,11 @@ class FriendList():
 
     def populateList(self, API:API):
         response = API.makeRequest(self.route)
-        arr = json.loads(response.text)['result']['friends']
+        try:
+            arr = json.loads(response.text)['result']['friends']
+        except Exception as e:
+            log('Failure with authorization: %s\Friends returns %s' % (e, response.text))
+            raise e
         self.friendList = [ Friend(friend) for friend in arr ]
 
 class Presence():
