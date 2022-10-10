@@ -89,6 +89,7 @@ class Discord():
         self.user = self.api.user
 
         presence = self.user.presence
+        log(presence.description())
         if self.rpc:
             if presence.game.name: # Please file an issue if this happens to fail
                 if self.currentGame != presence.game.name:
