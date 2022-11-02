@@ -7,6 +7,23 @@ import pypresence
 import threading
 from api import *
 
+def getAppPath():
+    applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
+    # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
+    # However os.path.expanduser does not actually check and assumes its in the default location.
+    # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
+    if os.name == 'nt':
+        try:
+            import ctypes.wintypes
+            CSIDL_PERSONAL = 5 # My Documents
+            SHGFP_TYPE_CURRENT = 0 # Get current, not default value
+            buf=ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+            ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
+            applicationPath = os.path.join(buf.value,'NSO-RPC')
+        except:pass
+    return applicationPath
+applicationPath = getAppPath()
+
 class Discord():
     def __init__(self, session_token = None, user_lang = None, rpc = False, targetID = None, version = None):
         self.rpc = None
@@ -72,7 +89,7 @@ class Discord():
                     self.api.targetID = input('Which user are you?\n-----\n%s\n-----\nPlease enter the ID here: ' % '\n-----\n'.join([ '%s (%s)' % (x.name, x.nsaId) for x in client.api.friends]))
                     if not self.api.targetID in (x.nsaId for x in client.api.friends):
                         sys.exit(log('Unknown ID input by user'))
-                    with open(os.path.join(os.path.expanduser('~/Documents/NSO-RPC'), 'private.txt'), 'w') as file:
+                    with open(os.path.join(applicationPath, 'private.txt'), 'w') as file:
                         file.write(json.dumps({
                             'session_token': self.api.session_token,
                             'user_lang': self.api.user_lang,
@@ -123,15 +140,14 @@ class Discord():
             time.sleep(1)
 
     def logout(self):
-        path = os.path.expanduser('~/Documents/NSO-RPC')
-        if os.path.isfile(os.path.join(path, 'private.txt')):
-            try:os.remove(os.path.join(path, 'private.txt'))
+        if os.path.isfile(os.path.join(applicationPath, 'private.txt')):
+            try:os.remove(os.path.join(applicationPath, 'private.txt'))
             except:pass
-            try:os.remove(os.path.join(path, 'settings.txt'))
+            try:os.remove(os.path.join(applicationPath, 'settings.txt'))
             except:pass
             sys.exit()
 
-def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/private.txt')):
+def getToken(manual = True, path:str = os.path.join(applicationPath, 'private.txt')):
     session_token, user_lang, targetID = None, None, None
     if os.path.isfile(path):
         with open(path, 'r') as file:
@@ -151,7 +167,7 @@ def getToken(manual = True, path:str = os.path.expanduser('~/Documents/NSO-RPC/p
         user_lang = input('Please enter your language from the list below:\n%s\n> ' % ('\n'.join(languages)))
         if not user_lang in languages:
             raise Exception('invalid user language')
-    tempToken = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
+    tempToken = os.path.join(applicationPath, 'tempToken.txt')
     if not os.path.isfile(path) and os.path.isfile(tempToken):
         os.remove(tempToken)
     return session_token, user_lang, targetID

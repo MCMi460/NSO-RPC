@@ -114,7 +114,23 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
-settingsFile = os.path.expanduser('~/Documents/NSO-RPC/settings.txt')
+def getAppPath():
+    applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
+    # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
+    # However os.path.expanduser does not actually check and assumes its in the default location.
+    # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
+    if os.name == 'nt':
+        try:
+            import ctypes.wintypes
+            CSIDL_PERSONAL = 5 # My Documents
+            SHGFP_TYPE_CURRENT = 0 # Get current, not default value
+            buf=ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+            ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
+            applicationPath = os.path.join(buf.value,'NSO-RPC')
+        except:pass
+    return applicationPath
+applicationPath = getAppPath()
+settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
     'dark': False,
 }
@@ -387,7 +403,7 @@ class GUI(Ui_MainWindow):
             client.api.targetID = userSelected
         else:
             client.api.targetID = None
-        with open(os.path.join(os.path.expanduser('~/Documents/NSO-RPC'), 'private.txt'), 'w') as file:
+        with open(os.path.join(applicationPath, 'private.txt'), 'w') as file:
             file.write(json.dumps({
                 'session_token': client.api.session_token,
                 'user_lang': client.api.user_lang,
