@@ -114,21 +114,6 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
-def getAppPath():
-    applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
-    # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
-    # However os.path.expanduser does not actually check and assumes its in the default location.
-    # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
-    if os.name == 'nt':
-        try:
-            import ctypes.wintypes
-            CSIDL_PERSONAL = 5 # My Documents
-            SHGFP_TYPE_CURRENT = 0 # Get current, not default value
-            buf=ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
-            ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-            applicationPath = os.path.join(buf.value,'NSO-RPC')
-        except:pass
-    return applicationPath
 applicationPath = getAppPath()
 settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
