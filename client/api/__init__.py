@@ -12,8 +12,24 @@ import hashlib
 import re
 import pickle
 
+def getAppPath():
+    applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
+    # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
+    # However os.path.expanduser does not actually check and assumes its in the default location.
+    # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
+    if os.name == 'nt':
+        try:
+            import ctypes.wintypes
+            CSIDL_PERSONAL = 5 # My Documents
+            SHGFP_TYPE_CURRENT = 0 # Get current, not default value
+            buf=ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+            ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
+            applicationPath = os.path.join(buf.value,'NSO-RPC')
+        except:pass
+    return applicationPath
+
 def log(info, time = time.time()):
-    path = os.path.expanduser('~/Documents/NSO-RPC')
+    path = getAppPath()
     if not os.path.isdir(path):
         os.mkdir(path)
     with open(os.path.join(path, 'logs.txt'), 'a') as file:
@@ -87,7 +103,7 @@ class API():
 
         self.friends = []
 
-        path = os.path.expanduser('~/Documents/NSO-RPC')
+        path = getAppPath()
         if not os.path.isdir(path):
             os.mkdir(path)
         with open(os.path.join(path, 'private.txt'), 'w') as file:
@@ -108,7 +124,7 @@ class API():
         return self.accessToken
 
     def updateLogin(self):
-        path = os.path.expanduser('~/Documents/NSO-RPC/tempToken.txt')
+        path = os.path.join(getAppPath(), 'tempToken.txt')
         if os.path.isfile(path):
             with open(path, 'rb') as file:
                 self.login = pickle.loads(file.read())

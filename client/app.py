@@ -114,7 +114,8 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
-settingsFile = os.path.expanduser('~/Documents/NSO-RPC/settings.txt')
+applicationPath = getAppPath()
+settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
     'dark': False,
 }
@@ -387,7 +388,7 @@ class GUI(Ui_MainWindow):
             client.api.targetID = userSelected
         else:
             client.api.targetID = None
-        with open(os.path.join(os.path.expanduser('~/Documents/NSO-RPC'), 'private.txt'), 'w') as file:
+        with open(os.path.join(applicationPath, 'private.txt'), 'w') as file:
             file.write(json.dumps({
                 'session_token': client.api.session_token,
                 'user_lang': client.api.user_lang,
