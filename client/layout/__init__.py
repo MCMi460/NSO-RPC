@@ -158,14 +158,14 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 385, 599))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 382, 599))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.stackedWidget_2.addWidget(self.page_2)
         self.page_3 = QtWidgets.QWidget()
         self.page_3.setObjectName("page_3")
         self.label_12 = QtWidgets.QLabel(self.page_3)
-        self.label_12.setGeometry(QtCore.QRect(10, 0, 101, 41))
+        self.label_12.setGeometry(QtCore.QRect(10, 10, 101, 21))
         self.label_12.setObjectName("label_12")
         self.pushButton_6 = QtWidgets.QPushButton(self.page_3)
         self.pushButton_6.setGeometry(QtCore.QRect(140, 550, 111, 41))
@@ -174,8 +174,11 @@ class Ui_MainWindow(object):
         self.label_15.setGeometry(QtCore.QRect(10, 50, 101, 21))
         self.label_15.setObjectName("label_15")
         self.label_16 = QtWidgets.QLabel(self.page_3)
-        self.label_16.setGeometry(QtCore.QRect(10, 80, 101, 41))
+        self.label_16.setGeometry(QtCore.QRect(10, 90, 101, 21))
         self.label_16.setObjectName("label_16")
+        self.label_17 = QtWidgets.QLabel(self.page_3)
+        self.label_17.setGeometry(QtCore.QRect(10, 130, 101, 21))
+        self.label_17.setObjectName("label_17")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -203,6 +206,7 @@ class Ui_MainWindow(object):
         self.pushButton_6.setText(_translate("MainWindow", "Logout"))
         self.label_15.setText(_translate("MainWindow", "Update Status:"))
         self.label_16.setText(_translate("MainWindow", "Dark Mode:"))
+        self.label_17.setText(_translate("MainWindow", "Start in Tray:"))
 
 
 if __name__ == "__main__":

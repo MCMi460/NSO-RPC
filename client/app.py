@@ -118,6 +118,7 @@ applicationPath = getAppPath()
 settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
     'dark': False,
+    'startInSystemTray': False,
 }
 userSelected = ''
 def writeSettings():
@@ -148,6 +149,11 @@ class GUI(Ui_MainWindow):
         self.assignVariables()
         if self.mode == 2:
             self.updateFriends()
+
+    def setVisability(self,mode):
+        global settings
+        settings['startInSystemTray'] = mode
+        writeSettings()
 
     def selfService(self):
         self.mode = 1
@@ -230,14 +236,14 @@ class GUI(Ui_MainWindow):
         self.presenceDesc.setAlignment(Qt.AlignCenter)
 
         # Settings
-        self.toggle = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle.setGeometry(QRect(101,41,60,41))
-
-        self.toggle2 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle2.setGeometry(QRect(101,82,60,41))
-
-        self.toggle3 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle3.setGeometry(QRect(101,0,60,41))
+        self.toggleDiscord = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleDiscord.setGeometry(QRect(101,0,60,41))
+        self.toggleStatus = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleStatus.setGeometry(QRect(101,40,60,41))
+        self.toggleTheme = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleTheme.setGeometry(QRect(101,80,60,41))
+        self.startInSystemTray = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.startInSystemTray.setGeometry(QRect(101,120,60,41))
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -299,12 +305,14 @@ class GUI(Ui_MainWindow):
         self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
 
         # Set toggle state
-        self.toggle.setChecked(client.running)
-        self.toggle.toggled.connect(self.switch)
-        self.toggle2.setChecked(settings['dark'])
-        self.toggle2.toggled.connect(self.setMode)
-        self.toggle3.setChecked(True if client.rpc else False)
-        self.toggle3.toggled.connect(self.toggleConnect)
+        self.toggleStatus.setChecked(client.running)
+        self.toggleStatus.toggled.connect(self.switch)
+        self.toggleTheme.setChecked(settings['dark'])
+        self.toggleTheme.toggled.connect(self.setMode)
+        self.toggleDiscord.setChecked(True if client.rpc else False)
+        self.toggleDiscord.toggled.connect(self.toggleConnect)
+        self.startInSystemTray.setChecked(settings['startInSystemTray'] | False)
+        self.startInSystemTray.toggled.connect(self.setVisability)
 
         # Set home
         self.switchMe()
@@ -509,10 +517,10 @@ class GUI(Ui_MainWindow):
         else:
             client.connect()
             if client.rpc:
-                self.toggle.setChecked(True)
+                self.toggleStatus.setChecked(True)
                 client.update()
             else:
-                self.toggle3.setChecked(False)
+                self.toggleDiscord.setChecked(False)
 
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):
@@ -581,6 +589,9 @@ if __name__ == '__main__':
 
     threading.Thread(target = clientBackgroundCatcher, daemon = True).start()
 
-    MainWindow.show()
+    if settings['startInSystemTray']:
+        tray.show()
+    else:
+        MainWindow.show()
 
     sys.exit(app.exec_())
