@@ -59,6 +59,9 @@ QPushButton {
 QPushButton:disabled {
   background-color: #706465;
 }
+QMenu::item {
+  color: #393939;
+}
 QScrollBar:vertical {
     border: 0px;
     background-color: transparent;
