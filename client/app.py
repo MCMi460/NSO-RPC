@@ -314,7 +314,7 @@ class GUI(Ui_MainWindow):
         self.toggleTheme.toggled.connect(self.setMode)
         self.toggleDiscord.setChecked(True if client.rpc else False)
         self.toggleDiscord.toggled.connect(self.toggleConnect)
-        self.startInSystemTray.setChecked(settings['startInSystemTray'] | False)
+        self.startInSystemTray.setChecked(settings.get("startInSystemTray", False))
         self.startInSystemTray.toggled.connect(self.setVisability)
 
         # Set home
@@ -592,7 +592,7 @@ if __name__ == '__main__':
 
     threading.Thread(target = clientBackgroundCatcher, daemon = True).start()
 
-    if settings['startInSystemTray']:
+    if settings.get("startInSystemTray")==True:
         tray.show()
     else:
         MainWindow.show()
