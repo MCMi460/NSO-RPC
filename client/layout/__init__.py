@@ -206,7 +206,7 @@ class Ui_MainWindow(object):
         self.pushButton_6.setText(_translate("MainWindow", "Logout"))
         self.label_15.setText(_translate("MainWindow", "Update Status:"))
         self.label_16.setText(_translate("MainWindow", "Dark Mode:"))
-        self.label_17.setText(_translate("MainWindow", "Start in Tray:"))
+        self.label_17.setText(_translate("MainWindow", "Start Minimized:"))
 
 
 if __name__ == "__main__":
