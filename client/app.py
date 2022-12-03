@@ -122,6 +122,7 @@ settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
     'dark': False,
     'startInSystemTray': False,
+    'startOnLaunch': False,
 }
 userSelected = ''
 def writeSettings():
@@ -156,6 +157,23 @@ class GUI(Ui_MainWindow):
     def setVisability(self,mode):
         global settings
         settings['startInSystemTray'] = mode
+        writeSettings()
+
+    def setLaunchMode(self,mode):
+        global settings
+        try:
+            if os.name == 'nt': # This is where Windows code should go
+                raise Exception('not implemented yet')
+            elif sys.platform.startswith('darwin'): # This is where macOS code should go
+                raise Exception('not implemented yet')
+            elif sys.platform.startswith('linux'): # This is where Linux code should go
+                raise Exception('not implemented yet')
+            else:
+                raise Exception('not implemented yet')
+            settings['startOnLaunch'] = mode
+        except:
+            settings['startOnLaunch'] = False
+            self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         writeSettings()
 
     def selfService(self):
@@ -247,6 +265,8 @@ class GUI(Ui_MainWindow):
         self.toggleTheme.setGeometry(QRect(101,80,60,41))
         self.startInSystemTray = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startInSystemTray.setGeometry(QRect(101,120,60,41))
+        self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.startOnLaunch.setGeometry(QRect(101,160,60,41))
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -316,6 +336,8 @@ class GUI(Ui_MainWindow):
         self.toggleDiscord.toggled.connect(self.toggleConnect)
         self.startInSystemTray.setChecked(settings.get("startInSystemTray", False))
         self.startInSystemTray.toggled.connect(self.setVisability)
+        self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
+        self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
         # Set home
         self.switchMe()

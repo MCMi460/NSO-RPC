@@ -487,7 +487,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>382</width>
+          <width>385</width>
           <height>599</height>
          </rect>
         </property>
@@ -558,6 +558,19 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
        </property>
        <property name="text">
         <string>Start Minimized:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_19">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>170</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Start on Launch:</string>
        </property>
       </widget>
      </widget>
