@@ -43,7 +43,7 @@ def getVersion():
             break
         except:
             log('Failed to get Apple\'s store page. Retrying...')
-    searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
+    searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
     version = searchPattern.findall(r.text)
     if version == []:
         return ''
