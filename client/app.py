@@ -25,6 +25,27 @@ try:
 except Exception as e:
     log(e)
     raise e
+
+# Helpful Wrapper code for handling autostar dependencies
+if getattr(sys, 'frozen', False):
+    isScriptBundled = True
+else:
+    isScriptBundled = False
+if not isScriptBundled:
+    if os.name == 'nt':
+    try:
+        import win32com.client
+        import winshell
+    except:
+        print("Trying to Install required modules\n")
+        os.system('python -m pip install pypiwin32 winshell')
+    from win32com.client import Dispatch
+    from winshell import Shortcut
+    if os.name == "darwin":
+        raise Exception('not implemented yet')
+    if os.name == "linux":
+        raise Exception('not implemented yet')
+
 # PyQt5 Variables
 style = """
 QWidget {
@@ -162,8 +183,23 @@ class GUI(Ui_MainWindow):
     def setLaunchMode(self,mode):
         global settings
         try:
-            if os.name == 'nt': # This is where Windows code should go
-                raise Exception('not implemented yet')
+            if os.name == 'nt': 
+                from win32com.client import Dispatch
+                from winshell import Shortcut
+                StartupFolder = os.path.join(os.getenv('APPDATA'), "Microsoft\Windows\Start Menu\Programs\Startup")
+                shell = Dispatch("WScript.Shell")
+                Shortcut = shell.CreateShortCut(os.path.join(StartupFolder, "NSO-RPC.lnk"))
+                Shortcut.Targetpath = sys.executable
+                Shortcut.WorkingDirectory = os.getcwd()
+                Shortcut.IconLocation = sys.executable
+                if not isScriptBundled:
+                    runningPath = os.getcwd()
+                    Shortcut.IconLocation = os.path.join(runningPath,"client\icon.ico")
+                    Shortcut.Arguments = os.path.abspath(__file__)
+                if settings['startOnLaunch'] == False:
+                    Shortcut.save()
+                elif settings['startOnLaunch'] == True:
+                    os.remove(os.path.join(StartupFolder, "NSO-RPC.lnk"))
             elif sys.platform.startswith('darwin'): # This is where macOS code should go
                 raise Exception('not implemented yet')
             elif sys.platform.startswith('linux'): # This is where Linux code should go
