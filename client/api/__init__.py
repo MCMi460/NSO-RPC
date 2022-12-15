@@ -8,6 +8,7 @@ import sys
 import webbrowser
 import base64
 import os
+import platform
 import hashlib
 import re
 import pickle
@@ -17,7 +18,7 @@ def getAppPath():
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
     # However os.path.expanduser does not actually check and assumes its in the default location.
     # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
-    if os.name == 'nt':
+    if platform.system() == 'Windows':
         try:
             import ctypes.wintypes
             CSIDL_PERSONAL = 5 # My Documents

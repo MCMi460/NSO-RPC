@@ -26,13 +26,13 @@ except Exception as e:
     log(e)
     raise e
 
-# Helpful Wrapper code for handling autostar dependencies
+# Helpful Wrapper code for handling autostart dependencies
 if getattr(sys, 'frozen', False):
     isScriptBundled = True
 else:
     isScriptBundled = False
 if not isScriptBundled:
-    if os.name == 'nt':
+    if platform.system() == 'Windows':
     try:
         import win32com.client
         import winshell
@@ -41,9 +41,9 @@ if not isScriptBundled:
         os.system('python -m pip install pypiwin32 winshell')
     from win32com.client import Dispatch
     from winshell import Shortcut
-    if os.name == "darwin":
+    if platform.system() == "Darwin":
         raise Exception('not implemented yet')
-    if os.name == "linux":
+    if platform.system() == "Linux":
         raise Exception('not implemented yet')
 
 # PyQt5 Variables
@@ -183,7 +183,7 @@ class GUI(Ui_MainWindow):
     def setLaunchMode(self,mode):
         global settings
         try:
-            if os.name == 'nt': 
+            if platform.system() == 'Windows': 
                 from win32com.client import Dispatch
                 from winshell import Shortcut
                 StartupFolder = os.path.join(os.getenv('APPDATA'), "Microsoft\Windows\Start Menu\Programs\Startup")
@@ -200,9 +200,9 @@ class GUI(Ui_MainWindow):
                     Shortcut.save()
                 elif settings['startOnLaunch'] == True:
                     os.remove(os.path.join(StartupFolder, "NSO-RPC.lnk"))
-            elif sys.platform.startswith('darwin'): # This is where macOS code should go
+            elif platform.system() == 'Darwin': # This is where macOS code should go
                 raise Exception('not implemented yet')
-            elif sys.platform.startswith('linux'): # This is where Linux code should go
+            elif platform.system() == "Linux": # This is where Linux code should go
                 raise Exception('not implemented yet')
             else:
                 raise Exception('not implemented yet')
