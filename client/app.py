@@ -43,8 +43,6 @@ if not isScriptBundled:
     from winshell import Shortcut
     if platform.system() == "Darwin":
         raise Exception('not implemented yet')
-    if platform.system() == "Linux":
-        raise Exception('not implemented yet')
 
 # PyQt5 Variables
 style = """
@@ -203,7 +201,31 @@ class GUI(Ui_MainWindow):
             elif platform.system() == 'Darwin': # This is where macOS code should go
                 raise Exception('not implemented yet')
             elif platform.system() == "Linux": # This is where Linux code should go
-                raise Exception('not implemented yet')
+                linuxServiceFile = [
+                        "[Unit]",
+                        "Description=NSO-RPC Autostart",
+                        "PartOf=graphical-session.target",
+                        "",
+                        "[Service]",
+                        "Type=simple",
+                        "StandardOutput=journal",
+                        "ExecStart="+" ".join([sys.executable, os.path.abspath(__file__)]),
+                        "",
+                        "[Install]",
+                        "WantedBy=graphical-session.target"
+                    ]
+                linuxServicePath = os.path.expanduser('~/.local/share/systemd/user')
+                if not os.path.exists(linuxServicePath):
+                    os.makedirs(linuxServicePath)
+                if settings['startOnLaunch'] == False:
+                    with open(os.path.join(linuxServicePath, "NSO-RPC.service"),'w') as out:
+                        out.writelines(line + "\n" for line in linuxServiceFile)
+                        out.close()
+                    os.system('systemctl --user daemon-reload && systemctl --user enable NSO-RPC.service')
+                else:
+                    os.system('systemctl --user disable NSO-RPC.service')
+                    os.remove(os.path.join(linuxServicePath, "NSO-RPC.service"))
+                    os.system('systemctl --user daemon-reload')
             else:
                 raise Exception('not implemented yet')
             settings['startOnLaunch'] = mode
