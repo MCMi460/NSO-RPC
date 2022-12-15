@@ -44,12 +44,8 @@ def getVersion():
             break
         except:
             log('Failed to get Apple\'s store page. Retrying...')
-    searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
+    searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
     version = searchPattern.findall(r.text)
-    if len(version[0]) == 0:
-        # Apple seems to have two spaces now before version number, this catches the edge case if this is just a temp fix.
-        searchPattern = re.compile(r'Version \s(\d\.\d\.\d)*')
-        version = searchPattern.findall(r.text) 
     if version == []:
         return ''
     pattern = re.compile(r'(\d.\d.\d)')
