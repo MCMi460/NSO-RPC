@@ -33,14 +33,14 @@ else:
     isScriptBundled = False
 if not isScriptBundled:
     if platform.system() == 'Windows':
-    try:
-        import win32com.client
-        import winshell
-    except:
-        print("Trying to Install required modules\n")
-        os.system('python -m pip install pypiwin32 winshell')
-    from win32com.client import Dispatch
-    from winshell import Shortcut
+        try:
+            import win32com.client
+            import winshell
+        except:
+            print('Trying to Install required modules: "pypiwin32" and "winshell"\n')
+            os.system(" ".join([sys.executable, "-m pip install pypiwin32 winshell"]))
+        from win32com.client import Dispatch
+        from winshell import Shortcut
     if platform.system() == "Darwin":
         raise Exception('not implemented yet')
 
@@ -233,7 +233,7 @@ class GUI(Ui_MainWindow):
             settings['startOnLaunch'] = False
             self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         writeSettings()
-
+ 
     def selfService(self):
         self.mode = 1
         self.setMode(settings['dark'])
