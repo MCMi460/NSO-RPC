@@ -41,8 +41,6 @@ if not isScriptBundled:
             os.system(" ".join([sys.executable, "-m pip install pypiwin32 winshell"]))
         from win32com.client import Dispatch
         from winshell import Shortcut
-    if platform.system() == "Darwin":
-        raise Exception('not implemented yet')
 
 # PyQt5 Variables
 style = """
@@ -198,8 +196,7 @@ class GUI(Ui_MainWindow):
                     Shortcut.save()
                 elif settings['startOnLaunch'] == True:
                     os.remove(os.path.join(StartupFolder, "NSO-RPC.lnk"))
-            elif platform.system() == 'Darwin': # This is where macOS code should go
-                raise Exception('not implemented yet')
+
             elif platform.system() == "Linux": # This is where Linux code should go
                 linuxServiceFile = [
                         "[Unit]",
@@ -325,6 +322,11 @@ class GUI(Ui_MainWindow):
         self.startInSystemTray.setGeometry(QRect(101,120,60,41))
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startOnLaunch.setGeometry(QRect(101,160,60,41))
+
+        # Prevent showing autostart option on MacOS as its currently unsupported
+        if platform.system() == "Darwin":
+            self.startOnLaunch.setHidden(True)
+            self.label_19.setHidden(True)
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -642,7 +644,7 @@ class SystemTrayApp(QSystemTrayIcon):
             except OSError:
                 break
         return False
-
+        
 if __name__ == '__main__':
     if os.path.isfile(settingsFile):
         readSettings()
