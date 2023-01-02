@@ -19,7 +19,11 @@ MainWindow = QMainWindow()
 session_token, user_lang, targetID = getToken(False)
 version = getVersion()
 while not version:
-    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)' % version)
+    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)\nEnter nothing and press Okay to be sent to the app store\'s website.' % version)
+    if not ok:
+        quit()
+    if ok and not version:
+        webbrowser.open('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557')
 try:
     client = Discord(session_token, user_lang, False, targetID, version)
 except Exception as e:
