@@ -1,6 +1,7 @@
 requests
 pypresence
 pyqt5
+qtpy
 qtwidgets
 
 pyinstaller-hooks-contrib>=2022.15
