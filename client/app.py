@@ -175,7 +175,7 @@ class GUI(Ui_MainWindow):
         if self.mode == 2:
             self.updateFriends()
 
-    def setVisability(self,mode):
+    def setVisibility(self,mode):
         global settings
         settings['startInSystemTray'] = mode
         writeSettings()
@@ -183,7 +183,7 @@ class GUI(Ui_MainWindow):
     def setLaunchMode(self,mode):
         global settings
         try:
-            if platform.system() == 'Windows': 
+            if platform.system() == 'Windows':
                 from win32com.client import Dispatch
                 from winshell import Shortcut
                 StartupFolder = os.path.join(os.getenv('APPDATA'), "Microsoft\Windows\Start Menu\Programs\Startup")
@@ -234,7 +234,7 @@ class GUI(Ui_MainWindow):
             settings['startOnLaunch'] = False
             self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         writeSettings()
- 
+
     def selfService(self):
         self.mode = 1
         self.setMode(settings['dark'])
@@ -399,7 +399,7 @@ class GUI(Ui_MainWindow):
         self.toggleDiscord.setChecked(True if client.rpc else False)
         self.toggleDiscord.toggled.connect(self.toggleConnect)
         self.startInSystemTray.setChecked(settings.get("startInSystemTray", False))
-        self.startInSystemTray.toggled.connect(self.setVisability)
+        self.startInSystemTray.toggled.connect(self.setVisibility)
         self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
@@ -648,7 +648,7 @@ class SystemTrayApp(QSystemTrayIcon):
             except OSError:
                 break
         return False
-        
+
 if __name__ == '__main__':
     if os.path.isfile(settingsFile):
         readSettings()
