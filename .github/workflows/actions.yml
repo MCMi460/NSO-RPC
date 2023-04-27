@@ -47,7 +47,7 @@ jobs:
         cd scripts &&
         ./build.sh &&
         cd ../client/dist &&
-        zip -r mac.zip NSO-RPC.app/
+        zip -yr mac.zip NSO-RPC.app/
 
     - name: "Upload Build"
       if: matrix.os == 'macos-latest'
