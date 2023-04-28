@@ -4,4 +4,4 @@ pyqt5
 qtpy
 qtwidgets
 
-pyinstaller-hooks-contrib>=2022.15
+pyinstaller-hooks-contrib>=2023.2
