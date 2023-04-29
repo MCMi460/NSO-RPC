@@ -352,6 +352,13 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startOnLaunch.setGeometry(QRect(101,160,60,41))
 
+        # [MacOS] Hide Buttons if running app.py directly.
+        if platform.system() == "Darwin" and not isScriptBundled:
+            self.startOnLaunch.setHidden(True)
+            self.label_19.setHidden(True)
+            self.startInSystemTray.setHidden(True)
+            self.label_17.setHidden(True)
+
     def closeEvent(self, event = None):
         if self.mode == 1:
             sys.exit('User closed')
