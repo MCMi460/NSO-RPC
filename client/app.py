@@ -229,6 +229,13 @@ class GUI(Ui_MainWindow):
                     os.system('systemctl --user daemon-reload')
             elif platform.system() == "Darwin":
                 applicationPath = os.path.join(os.path.normpath(os.getcwd() + os.sep + os.pardir), "MacOS/NSO-RPC")
+                                
+                # Rebuild the path if we're running inside Downloads (This assumes that only Downloads can have /private/var/folders)
+                if applicationPath.startswith("/private"):
+                    applicationPathTmp = applicationPath.split("/")
+                    applicationPathTmp = applicationPathTmp[len(applicationPathTmp)-4:len(applicationPathTmp)]
+                    applicationPath = os.path.join(os.path.expanduser('~/Downloads'), "/".join(applicationPathTmp))
+
                 macOSplist = [
                         '<?xml version="1.0" encoding="UTF-8"?>',
                         '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
