@@ -227,6 +227,31 @@ class GUI(Ui_MainWindow):
                     os.system('systemctl --user disable NSO-RPC.service')
                     os.remove(os.path.join(linuxServicePath, "NSO-RPC.service"))
                     os.system('systemctl --user daemon-reload')
+            elif platform.system() == "Darwin":
+                applicationPath = os.path.join(os.path.normpath(os.getcwd() + os.sep + os.pardir), "MacOS/NSO-RPC")
+                macOSplist = [
+                        '<?xml version="1.0" encoding="UTF-8"?>',
+                        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+                        '<plist version="1.0">',
+                        '	<dict>',
+                        '		<key>Label</key>',
+                        '		<string>NSO-RPC.app</string>',
+                        '		<key>Program</key>',                       
+                        '		<string>'+applicationPath+'</string>',
+                        '		<key>RunAtLoad</key>',
+                        '		<true/>',
+                        '	</dict>',
+                        '</plist>'
+                ]
+                macOSLaunchAgentPath = os.path.expanduser('~/Library/LaunchAgents')
+                if not os.path.exists(macOSLaunchAgentPath):
+                    os.makedirs(macOSLaunchAgentPath)
+                if settings['startOnLaunch'] == False:
+                    with open(os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"),'w') as out:
+                        out.writelines(line + "\n" for line in macOSplist)
+                        out.close()
+                else:
+                    os.system('rm '+ os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"))
             else:
                 raise Exception('not implemented yet')
             settings['startOnLaunch'] = mode
@@ -327,10 +352,12 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startOnLaunch.setGeometry(QRect(101,160,60,41))
 
-        # Prevent showing autostart option on MacOS as its currently unsupported
-        if platform.system() == "Darwin":
+        # [MacOS] Hide Buttons if running app.py directly.
+        if platform.system() == "Darwin" and not isScriptBundled:
             self.startOnLaunch.setHidden(True)
             self.label_19.setHidden(True)
+            self.startInSystemTray.setHidden(True)
+            self.label_17.setHidden(True)
 
     def closeEvent(self, event = None):
         if self.mode == 1:
