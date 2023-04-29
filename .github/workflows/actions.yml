@@ -29,10 +29,6 @@ jobs:
         files: client/dist/NSO-RPC.exe
 
     # Linux Build
-    - name: "Copy install.sh to linux.sh"
-      if: matrix.os == 'ubuntu-latest'
-      run: cp scripts/install.sh scripts/linux.sh
-
     - name: "Upload script"
       if: matrix.os == 'ubuntu-latest'
       uses: softprops/action-gh-release@v0.1.15
