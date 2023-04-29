@@ -1,7 +1,7 @@
 name: 'Build NSO-RPC'
 on:
   release:
-    types: [released]
+    types: [published]
 
 jobs:
   build:
