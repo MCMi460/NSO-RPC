@@ -459,6 +459,10 @@ class GUI(Ui_MainWindow):
             state = ''
             self.pushButton_7.setEnabled(False)
             self.pushButton_8.setEnabled(False)
+
+            # Show notice when you dont have an account selected in friends.
+            self.label_20.setHidden(False)
+            self.label_21.setText('<a href=\"https://github.com/MCMi460/NSO-RPC#quickstart-guide\" style=\"color: cyan;\">NSO-RPC Quickstart Guide</a>')
         except:
             zone = '%Y/%m/%d'
             if client.api.userInfo['language'] == 'en-US':
@@ -469,6 +473,9 @@ class GUI(Ui_MainWindow):
             state = timeSince(user.presence.logoutAt)
             self.pushButton_7.setEnabled(True)
             self.pushButton_8.setEnabled(True)
+            # Hide Notice and Quickstart Link.
+            self.label_20.setHidden(True)
+            self.label_21.setHidden(True)
 
         if user == client.api.user:
             self.pushButton_7.setEnabled(False)

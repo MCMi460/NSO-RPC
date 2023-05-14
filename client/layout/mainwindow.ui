@@ -462,6 +462,51 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
         <string>Revert</string>
        </property>
       </widget>
+      <widget class="QLabel" name="label_20">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>280</y>
+         <width>341</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Notice: You currently don't have an account selected.
+Please note that NSO-RPC requires two different Nintendo accounts.</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_21">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>340</y>
+         <width>201</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_2">
       <widget class="QScrollArea" name="scrollArea">
@@ -487,7 +532,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>385</width>
+          <width>382</width>
           <height>599</height>
          </rect>
         </property>
