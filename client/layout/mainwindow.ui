@@ -215,7 +215,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>120</y>
+        <y>121</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -241,7 +241,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>160</y>
+        <y>161</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -481,6 +481,9 @@ Please note that NSO-RPC requires two different Nintendo accounts.</string>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
       </widget>
       <widget class="QLabel" name="label_21">
        <property name="enabled">
@@ -489,7 +492,7 @@ Please note that NSO-RPC requires two different Nintendo accounts.</string>
        <property name="geometry">
         <rect>
          <x>100</x>
-         <y>340</y>
+         <y>360</y>
          <width>201</width>
          <height>20</height>
         </rect>
@@ -532,7 +535,7 @@ Please note that NSO-RPC requires two different Nintendo accounts.</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>382</width>
+          <width>385</width>
           <height>599</height>
          </rect>
         </property>

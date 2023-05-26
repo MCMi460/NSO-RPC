@@ -229,7 +229,7 @@ class GUI(Ui_MainWindow):
                     os.system('systemctl --user daemon-reload')
             elif platform.system() == "Darwin":
                 applicationPath = os.path.join(os.path.normpath(os.getcwd() + os.sep + os.pardir), "MacOS/NSO-RPC")
-                                
+
                 # Rebuild the path if we're running inside Downloads (This assumes that only Downloads can have /private/var/folders)
                 if applicationPath.startswith("/private"):
                     applicationPathTmp = applicationPath.split("/")
@@ -243,7 +243,7 @@ class GUI(Ui_MainWindow):
                         '	<dict>',
                         '		<key>Label</key>',
                         '		<string>NSO-RPC.app</string>',
-                        '		<key>Program</key>',                       
+                        '		<key>Program</key>',
                         '		<string>'+applicationPath+'</string>',
                         '		<key>RunAtLoad</key>',
                         '		<true/>',
@@ -462,7 +462,7 @@ class GUI(Ui_MainWindow):
 
             # Show notice when you dont have an account selected in friends.
             self.label_20.setHidden(False)
-            self.label_21.setText('<a href=\"https://github.com/MCMi460/NSO-RPC#quickstart-guide\" style=\"color: cyan;\">NSO-RPC Quickstart Guide</a>')
+            self.label_21.setText('<a href="https://github.com/MCMi460/NSO-RPC#quickstart-guide" style="color: cyan;">NSO-RPC Quickstart Guide</a>')
         except:
             zone = '%Y/%m/%d'
             if client.api.userInfo['language'] == 'en-US':
