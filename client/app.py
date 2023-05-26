@@ -19,12 +19,33 @@ MainWindow = QMainWindow()
 session_token, user_lang, targetID = getToken(False)
 version = getVersion()
 while not version:
-    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)' % version)
+    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)\nEnter nothing and press Okay to be sent to the app store\'s website.' % version)
+    if not ok:
+        quit()
+    if ok and not version:
+        webbrowser.open('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557')
 try:
     client = Discord(session_token, user_lang, False, targetID, version)
 except Exception as e:
     log(e)
     raise e
+
+# Helpful Wrapper code for handling autostart dependencies
+if getattr(sys, 'frozen', False):
+    isScriptBundled = True
+else:
+    isScriptBundled = False
+if not isScriptBundled:
+    if platform.system() == 'Windows':
+        try:
+            import win32com.client
+            import winshell
+        except:
+            print('Trying to Install required modules: "pypiwin32" and "winshell"\n')
+            os.system(" ".join([sys.executable, "-m pip install pypiwin32 winshell"]))
+        from win32com.client import Dispatch
+        from winshell import Shortcut
+
 # PyQt5 Variables
 style = """
 QWidget {
@@ -58,6 +79,9 @@ QPushButton {
 }
 QPushButton:disabled {
   background-color: #706465;
+}
+QMenu::item {
+  color: #393939;
 }
 QScrollBar:vertical {
     border: 0px;
@@ -118,6 +142,8 @@ applicationPath = getAppPath()
 settingsFile = os.path.join(applicationPath,'settings.txt')
 settings = {
     'dark': False,
+    'startInSystemTray': False,
+    'startOnLaunch': False,
 }
 userSelected = ''
 def writeSettings():
@@ -148,6 +174,98 @@ class GUI(Ui_MainWindow):
         self.assignVariables()
         if self.mode == 2:
             self.updateFriends()
+
+    def setVisibility(self,mode):
+        global settings
+        settings['startInSystemTray'] = mode
+        writeSettings()
+
+    def setLaunchMode(self,mode):
+        global settings
+        try:
+            if platform.system() == 'Windows':
+                from win32com.client import Dispatch
+                from winshell import Shortcut
+                StartupFolder = os.path.join(os.getenv('APPDATA'), "Microsoft\Windows\Start Menu\Programs\Startup")
+                shell = Dispatch("WScript.Shell")
+                Shortcut = shell.CreateShortCut(os.path.join(StartupFolder, "NSO-RPC.lnk"))
+                Shortcut.Targetpath = sys.executable
+                Shortcut.WorkingDirectory = os.getcwd()
+                Shortcut.IconLocation = sys.executable
+                if not isScriptBundled:
+                    runningPath = os.getcwd()
+                    Shortcut.IconLocation = os.path.join(runningPath,"client\icon.ico")
+                    Shortcut.Arguments = os.path.abspath(__file__)
+                if settings['startOnLaunch'] == False:
+                    Shortcut.save()
+                elif settings['startOnLaunch'] == True:
+                    os.remove(os.path.join(StartupFolder, "NSO-RPC.lnk"))
+
+            elif platform.system() == "Linux": # This is where Linux code should go
+                linuxServiceFile = [
+                        "[Unit]",
+                        "Description=NSO-RPC Autostart",
+                        "PartOf=graphical-session.target",
+                        "",
+                        "[Service]",
+                        "Type=simple",
+                        "StandardOutput=journal",
+                        "ExecStart="+" ".join([sys.executable, os.path.abspath(__file__)]),
+                        "",
+                        "[Install]",
+                        "WantedBy=graphical-session.target"
+                    ]
+                linuxServicePath = os.path.expanduser('~/.local/share/systemd/user')
+                if not os.path.exists(linuxServicePath):
+                    os.makedirs(linuxServicePath)
+                if settings['startOnLaunch'] == False:
+                    with open(os.path.join(linuxServicePath, "NSO-RPC.service"),'w') as out:
+                        out.writelines(line + "\n" for line in linuxServiceFile)
+                        out.close()
+                    os.system('systemctl --user daemon-reload && systemctl --user enable NSO-RPC.service')
+                else:
+                    os.system('systemctl --user disable NSO-RPC.service')
+                    os.remove(os.path.join(linuxServicePath, "NSO-RPC.service"))
+                    os.system('systemctl --user daemon-reload')
+            elif platform.system() == "Darwin":
+                applicationPath = os.path.join(os.path.normpath(os.getcwd() + os.sep + os.pardir), "MacOS/NSO-RPC")
+
+                # Rebuild the path if we're running inside Downloads (This assumes that only Downloads can have /private/var/folders)
+                if applicationPath.startswith("/private"):
+                    applicationPathTmp = applicationPath.split("/")
+                    applicationPathTmp = applicationPathTmp[len(applicationPathTmp)-4:len(applicationPathTmp)]
+                    applicationPath = os.path.join(os.path.expanduser('~/Downloads'), "/".join(applicationPathTmp))
+
+                macOSplist = [
+                        '<?xml version="1.0" encoding="UTF-8"?>',
+                        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+                        '<plist version="1.0">',
+                        '	<dict>',
+                        '		<key>Label</key>',
+                        '		<string>NSO-RPC.app</string>',
+                        '		<key>Program</key>',
+                        '		<string>'+applicationPath+'</string>',
+                        '		<key>RunAtLoad</key>',
+                        '		<true/>',
+                        '	</dict>',
+                        '</plist>'
+                ]
+                macOSLaunchAgentPath = os.path.expanduser('~/Library/LaunchAgents')
+                if not os.path.exists(macOSLaunchAgentPath):
+                    os.makedirs(macOSLaunchAgentPath)
+                if settings['startOnLaunch'] == False:
+                    with open(os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"),'w') as out:
+                        out.writelines(line + "\n" for line in macOSplist)
+                        out.close()
+                else:
+                    os.system('rm '+ os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"))
+            else:
+                raise Exception('not implemented yet')
+            settings['startOnLaunch'] = mode
+        except:
+            settings['startOnLaunch'] = False
+            self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
+        writeSettings()
 
     def selfService(self):
         self.mode = 1
@@ -230,14 +348,23 @@ class GUI(Ui_MainWindow):
         self.presenceDesc.setAlignment(Qt.AlignCenter)
 
         # Settings
-        self.toggle = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle.setGeometry(QRect(101,41,60,41))
+        self.toggleDiscord = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleDiscord.setGeometry(QRect(101,0,60,41))
+        self.toggleStatus = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleStatus.setGeometry(QRect(101,40,60,41))
+        self.toggleTheme = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleTheme.setGeometry(QRect(101,80,60,41))
+        self.startInSystemTray = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.startInSystemTray.setGeometry(QRect(101,120,60,41))
+        self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.startOnLaunch.setGeometry(QRect(101,160,60,41))
 
-        self.toggle2 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle2.setGeometry(QRect(101,82,60,41))
-
-        self.toggle3 = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggle3.setGeometry(QRect(101,0,60,41))
+        # [MacOS] Hide Buttons if running app.py directly.
+        if platform.system() == "Darwin" and not isScriptBundled:
+            self.startOnLaunch.setHidden(True)
+            self.label_19.setHidden(True)
+            self.startInSystemTray.setHidden(True)
+            self.label_17.setHidden(True)
 
     def closeEvent(self, event = None):
         if self.mode == 1:
@@ -299,12 +426,16 @@ class GUI(Ui_MainWindow):
         self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
 
         # Set toggle state
-        self.toggle.setChecked(client.running)
-        self.toggle.toggled.connect(self.switch)
-        self.toggle2.setChecked(settings['dark'])
-        self.toggle2.toggled.connect(self.setMode)
-        self.toggle3.setChecked(True if client.rpc else False)
-        self.toggle3.toggled.connect(self.toggleConnect)
+        self.toggleStatus.setChecked(client.running)
+        self.toggleStatus.toggled.connect(self.switch)
+        self.toggleTheme.setChecked(settings['dark'])
+        self.toggleTheme.toggled.connect(self.setMode)
+        self.toggleDiscord.setChecked(True if client.rpc else False)
+        self.toggleDiscord.toggled.connect(self.toggleConnect)
+        self.startInSystemTray.setChecked(settings.get("startInSystemTray", False))
+        self.startInSystemTray.toggled.connect(self.setVisibility)
+        self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
+        self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
         # Set home
         self.switchMe()
@@ -328,6 +459,10 @@ class GUI(Ui_MainWindow):
             state = ''
             self.pushButton_7.setEnabled(False)
             self.pushButton_8.setEnabled(False)
+
+            # Show notice when you dont have an account selected in friends.
+            self.label_20.setHidden(False)
+            self.label_21.setText('<a href="https://github.com/MCMi460/NSO-RPC#quickstart-guide" style="color: cyan;">NSO-RPC Quickstart Guide</a>')
         except:
             zone = '%Y/%m/%d'
             if client.api.userInfo['language'] == 'en-US':
@@ -338,6 +473,9 @@ class GUI(Ui_MainWindow):
             state = timeSince(user.presence.logoutAt)
             self.pushButton_7.setEnabled(True)
             self.pushButton_8.setEnabled(True)
+            # Hide Notice and Quickstart Link.
+            self.label_20.setHidden(True)
+            self.label_21.setHidden(True)
 
         if user == client.api.user:
             self.pushButton_7.setEnabled(False)
@@ -509,10 +647,10 @@ class GUI(Ui_MainWindow):
         else:
             client.connect()
             if client.rpc:
-                self.toggle.setChecked(True)
+                self.toggleStatus.setChecked(True)
                 client.update()
             else:
-                self.toggle3.setChecked(False)
+                self.toggleDiscord.setChecked(False)
 
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):
@@ -581,6 +719,9 @@ if __name__ == '__main__':
 
     threading.Thread(target = clientBackgroundCatcher, daemon = True).start()
 
-    MainWindow.show()
+    if settings.get("startInSystemTray")==True:
+        tray.show()
+    else:
+        MainWindow.show()
 
     sys.exit(app.exec_())

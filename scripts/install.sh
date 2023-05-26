@@ -12,8 +12,14 @@ function checkDir {
   fi
 }
 
+# Only try and install pip if its missing
+if pip --version &>/dev/null; then
+  sudo apt-get install python3-pyqt5
+else
+  sudo apt-get install python3-pyqt5 python3-pip
+fi
+
 cd ../client
-sudo apt-get install python3-pyqt5
 python3 -m pip install -r requirements.txt
 
 executableDir='/opt/NSO-RPC/'

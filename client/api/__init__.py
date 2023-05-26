@@ -8,6 +8,7 @@ import sys
 import webbrowser
 import base64
 import os
+import platform
 import hashlib
 import re
 import pickle
@@ -17,7 +18,7 @@ def getAppPath():
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
     # However os.path.expanduser does not actually check and assumes its in the default location.
     # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
-    if os.name == 'nt':
+    if platform.system() == 'Windows':
         try:
             import ctypes.wintypes
             CSIDL_PERSONAL = 5 # My Documents
@@ -43,9 +44,9 @@ def getVersion():
             break
         except:
             log('Failed to get Apple\'s store page. Retrying...')
-    searchPattern = re.compile(r'Version\s(\d\.\d\.\d)*')
+    searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
     version = searchPattern.findall(r.text)
-    if version == []:
+    if not version:
         return ''
     pattern = re.compile(r'(\d.\d.\d)')
     if not re.search(pattern, version[0]):
@@ -209,14 +210,15 @@ class UsersMe():
         return json.loads(response.text)
 
 class imink():
-    def __init__(self, id_token, timestamp, guid, iteration):
+    def __init__(self, na_id, id_token, timestamp, guid, iteration):
         self.headers = {
             'User-Agent': 'NSO-RPC/%s' % version,
             'Content-Type': 'application/json; charset=utf-8',
         }
         self.body = {
             'token': id_token,
-            'hashMethod': str(iteration),
+            'hash_method': str(iteration),
+            'na_id': na_id,
         }
 
         self.url = 'https://api.imink.app'
@@ -249,8 +251,9 @@ class Login():
 
         self.userInfo = userInfo
         self.accessToken = accessToken
+        self.na_id = userInfo['id']
 
-        self.imink = imink(self.accessToken, self.timestamp, self.guid, 1).get()
+        self.imink = imink(self.na_id, self.accessToken, self.timestamp, self.guid, 1).get()
         self.timestamp = int(self.imink['timestamp'])
         self.guid = self.imink['request_id']
 
