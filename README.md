@@ -67,6 +67,9 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 ***Q: I can't link my Nintendo Account. What do I do?***  
 **A:** Refer to the question above.
 
+***Q: My status is displaying as offline and won't change!***  
+**A:** First, [make sure that you have a secondary account linked](#quick) and have selected your main account from the friends list. If you've done that and you're still having problems with an offline status, *make sure that both settings in your user profile (play activity and display online status settings) are set to "all friends"*.
+
 *I am not liable for any sort of rate limiting Nintendo may hammer upon your network*
 
 <h1 id = 'depth'>In-depth guide</h1>
