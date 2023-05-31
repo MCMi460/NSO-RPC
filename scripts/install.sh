@@ -14,9 +14,9 @@ function checkDir {
 
 # Only try and install pip if its missing
 if pip --version &>/dev/null; then
-  sudo apt-get install python3-pyqt5
+  sudo apt-get install python3-pyqt6
 else
-  sudo apt-get install python3-pyqt5 python3-pip
+  sudo apt-get install python3-pyqt6 python3-pip
 fi
 
 cd ../client

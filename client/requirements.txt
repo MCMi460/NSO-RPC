@@ -1,8 +1,7 @@
 requests
 pypresence
-pyqt5
 qtpy
-qtwidgets
+qtwidgets @ git+https://github.com/HotaruBlaze/python-qtwidgets@e0fdba848725749775aceefc5d29e15865667bf0
 
 pyinstaller==5.10.1
 charset_normalizer<3.0

@@ -1,9 +1,10 @@
 # Created by Deltaion Lee (MCMi460) on Github
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from qtpy.QtCore import *
+from qtpy.QtWidgets import *
+from qtpy.QtGui import *
 from layout import Ui_MainWindow
+
 import sys
 import threading
 import requests

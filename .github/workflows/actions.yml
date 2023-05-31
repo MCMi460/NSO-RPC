@@ -20,7 +20,10 @@ jobs:
     # Windows Build
     - name: "Build"
       if: matrix.os == 'windows-latest'
-      run: cd scripts && ./build.bat
+      run: |
+        cd scripts && 
+        python -m pip install pyqt6 &&
+        ./build.bat
 
     - name: "Upload Build"
       if: matrix.os == 'windows-latest'
@@ -35,12 +38,12 @@ jobs:
       with:
         files: scripts/linux.sh
 
-
     # MacOS Build
     - name: "Build"
       if: matrix.os == 'macos-latest'
       run: |
         cd scripts &&
+        python -m pip install pyqt6 &&
         ./build.sh &&
         cd ../client/dist &&
         ln -s /Applications "Applications (admin)" &&
