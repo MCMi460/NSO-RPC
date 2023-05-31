@@ -525,7 +525,6 @@ class GUI(Ui_MainWindow):
         userSelected = user.nsaId
 
     def checkDiscordError(self):
-        print('test')
         # This just assumes that if client.rpc is set to None, then there was a permission issue preventing NSO-RPC.
         # There was an attempt at catching the [Access is denied] event in the cli, however I had scope and timing issues with it.
         # We also assume that only Windows users would experence this permission oversight.
@@ -536,7 +535,7 @@ class GUI(Ui_MainWindow):
                 msg = ''
                 if 'WinError 5' in str(ret[1]):
                     msg = 'Try running NSO-RPC with Administrator.'
-                elif 'Could not find Discord' in str(ret[1]):
+                elif 'Could not find Discord' in str(ret[1]) or 'Connection refused' in str(ret[1]):
                     msg = 'Try opening Discord first.'
                 self.label_12.setFixedWidth(self.label_12.width()+120)
                 self.label_12.setFixedHeight(36)
