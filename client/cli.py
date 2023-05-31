@@ -13,7 +13,7 @@ class Discord():
     def __init__(self, session_token = None, user_lang = None, rpc = False, targetID = None, version = None):
         self.rpc = None
         if rpc:
-            if not self.connect():
+            if not self.connect()[0]:
                 sys.exit("Failed to connect to Discord")
         self.running = False
         self.api = None
@@ -38,9 +38,9 @@ class Discord():
     def connect(self):
         try:
             self.rpc = pypresence.Presence('637692124539650048')
-        except:
+        except Exception as e:
             self.rpc = None
-            return False
+            return (False, e)
         fails = 0
         while True:
             # Attempt to connect to Discord. Will wait until it connects
@@ -52,9 +52,9 @@ class Discord():
                 if fails > 500:
                     print(log('Error, failed after 500 attempts\n\'%s\'' % e))
                     self.rpc = None
-                    return False
+                    return (False, e)
                 continue
-        return True
+        return (True,)
 
     def disconnect(self):
         if self.rpc:
