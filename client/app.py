@@ -437,6 +437,15 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
+        # This just assumes that if client.rpc is set to None, that their was a permission issue preventing NSO-RPC.
+        # Their was an attempt at catching the [Access is denied] event in the cli, however i had scope and timing issues with it.
+        # We also assume that only Windows users would experence this permission oversight.
+        if not client.rpc and platform.system() == 'Windows':
+            self.label_12.setFixedWidth(self.label_12.width()+120)
+            self.label_12.setFixedHeight(self.label_12.height()+15)
+            self.label_12.setText("<a style='color: orange;'>Unable to connect to Discord,<br>Try running NSO-RPC with Administrator.</a>")
+            self.toggleDiscord.setHidden(True)
+
         # Set home
         self.switchMe()
 
