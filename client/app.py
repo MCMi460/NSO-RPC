@@ -438,6 +438,8 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
+        self.checkDiscordError()
+
         # Set home
         self.switchMe()
 
@@ -521,6 +523,29 @@ class GUI(Ui_MainWindow):
         self.presenceState.adjustSize()
 
         userSelected = user.nsaId
+
+    def checkDiscordError(self):
+        print('test')
+        # This just assumes that if client.rpc is set to None, then there was a permission issue preventing NSO-RPC.
+        # There was an attempt at catching the [Access is denied] event in the cli, however I had scope and timing issues with it.
+        # We also assume that only Windows users would experence this permission oversight.
+        # Updated by MCMi460 -- works for Admin issues as well as Discord is not running issues.
+        if not client.rpc:
+            ret = client.connect()
+            if not ret[0]:
+                msg = ''
+                if 'WinError 5' in str(ret[1]):
+                    msg = 'Try running NSO-RPC with Administrator.'
+                elif 'Could not find Discord' in str(ret[1]):
+                    msg = 'Try opening Discord first.'
+                self.label_12.setFixedWidth(self.label_12.width()+120)
+                self.label_12.setFixedHeight(36)
+                self.label_12.setText("<a style='color: orange;'>Unable to connect to Discord!<br>%s</a>" % msg)
+                self.toggleDiscord.setHidden(True)
+        else:
+            self.toggleDiscord.setHidden(False)
+            self.label_12.setFixedHeight(21)
+            self.label_12.setText('Discord:')
 
     def updateProfile(self, new):
         if new:
@@ -629,6 +654,7 @@ class GUI(Ui_MainWindow):
         self.stackedWidget_2.setCurrentIndex(1)
 
     def switchSettings(self):
+        self.checkDiscordError()
         self.stackedWidget_2.setCurrentIndex(2)
 
     def openPfp(self, event = None):
