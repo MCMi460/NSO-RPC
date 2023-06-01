@@ -15,6 +15,7 @@ from cli import *
 # PyQt5 Initialization
 app = QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
+app.setApplicationName("NSO-RPC")
 MainWindow = QMainWindow()
 # NSO Variables
 session_token, user_lang, targetID = getToken(False)
@@ -211,6 +212,7 @@ class GUI(Ui_MainWindow):
                         "[Service]",
                         "Type=simple",
                         "StandardOutput=journal",
+                        "WorkingDirectory="+os.getcwd(),
                         "ExecStart="+" ".join([sys.executable, os.path.abspath(__file__)]),
                         "",
                         "[Install]",
