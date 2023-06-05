@@ -70,6 +70,9 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 ***Q: My status is displaying as offline and won't change!***  
 **A:** First, [make sure that you have a secondary account linked](#quick) and have selected your main account from the friends list. If you've done that and you're still having problems with an offline status, *make sure that both settings in your user profile (play activity and display online status settings) are set to "all friends"*.
 
+***Q: I keep getting Error Code 9407; what should I do?***  
+**A:** You're going to have to link your account with a real Nintendo Switch at least once in order to use the API and add your main account as a friend. (See [#73](https://github.com/MCMi460/NSO-RPC/issues/73))
+
 *I am not liable for any sort of rate limiting Nintendo may hammer upon your network*
 
 <h1 id = 'depth'>In-depth guide</h1>
