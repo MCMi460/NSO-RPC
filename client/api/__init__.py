@@ -13,6 +13,7 @@ import hashlib
 import re
 import pickle
 
+
 def getAppPath():
     applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
@@ -21,13 +22,15 @@ def getAppPath():
     if platform.system() == 'Windows':
         try:
             import ctypes.wintypes
-            CSIDL_PERSONAL = 5 # My Documents
-            SHGFP_TYPE_CURRENT = 0 # Get current, not default value
-            buf=ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+            CSIDL_PERSONAL = 5  # My Documents
+            SHGFP_TYPE_CURRENT = 0  # Get current, not default value
+            buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
             ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-            applicationPath = os.path.join(buf.value,'NSO-RPC')
-        except:pass
+            applicationPath = os.path.join(buf.value, 'NSO-RPC')
+        except:
+            pass
     return applicationPath
+
 
 def log(info, time = time.time()):
     path = getAppPath()
@@ -36,6 +39,7 @@ def log(info, time = time.time()):
     with open(os.path.join(path, 'logs.txt'), 'a') as file:
         file.write('%s: %s\n' % (time, info))
     return info
+
 
 def getVersion():
     for i in range(5):
@@ -53,22 +57,24 @@ def getVersion():
         return ''
     return version[0]
 
+
 client_id = '71b963c1b7b6d119'
 version = 0.3
 nsoAppVersion = None
-languages = [ # ISO Language codes
-'en-US',
-'es-MX',
-'fr-CA',
-'ja-JP',
-'en-GB',
-'es-ES',
-'fr-FR',
-'de-DE',
-'it-IT',
-'nl-NL',
-'ru-RU'
+languages = [  # ISO Language codes
+    'en-US',
+    'es-MX',
+    'fr-CA',
+    'ja-JP',
+    'en-GB',
+    'es-ES',
+    'fr-FR',
+    'de-DE',
+    'it-IT',
+    'nl-NL',
+    'ru-RU'
 ]
+
 
 class API():
     def __init__(self, session_token, user_lang, targetID, version):
@@ -142,7 +148,7 @@ class API():
         login = Login(self.userInfo, self.user_lang, self.accessToken, self.guid)
         login.loginToAccount()
         try:
-            self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken') # Add authorization token
+            self.headers['Authorization'] = 'Bearer %s' % login.account['result'].get('webApiServerCredential').get('accessToken')  # Add authorization token
         except Exception as e:
             raise Exception('Failure with authorization: %s\nLogin returns %s' % (e, login.account))
         self.login = {
@@ -169,6 +175,7 @@ class API():
         list.populateList(self)
         self.friends = list.friendList
 
+
 class Nintendo():
     def __init__(self, sessionToken, userLang):
         self.headers = {
@@ -190,6 +197,7 @@ class Nintendo():
         response = requests.post(self.url + route, headers = self.headers, json = self.body)
         return json.loads(response.text)
 
+
 class UsersMe():
     def __init__(self, accessToken, userLang):
         self.headers = {
@@ -208,6 +216,7 @@ class UsersMe():
 
         response = requests.get(self.url + route, headers = self.headers)
         return json.loads(response.text)
+
 
 class imink():
     def __init__(self, na_id, id_token, timestamp, guid, iteration):
@@ -230,6 +239,7 @@ class imink():
         response = requests.post(self.url + route, headers = self.headers, data = json.dumps(self.body))
         return json.loads(response.text)
 
+
 class Login():
     def __init__(self, userInfo, userLang, accessToken, guid):
         self.headers = {
@@ -246,7 +256,7 @@ class Login():
         }
 
         self.url = 'https://api-lp1.znc.srv.nintendo.net'
-        self.timestamp = int(time.time()) * 1000 # Convert from iOS to Android
+        self.timestamp = int(time.time()) * 1000  # Convert from iOS to Android
         self.guid = guid
 
         self.userInfo = userInfo
@@ -276,6 +286,7 @@ class Login():
         self.account = json.loads(response.text)
         return self.account
 
+
 class User():
     def __init__(self, f):
         self.id = f.get('id')
@@ -292,9 +303,10 @@ class User():
 
     def description(self):
         return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
-        + '   - Profile Picture: %s\n' % self.imageUri
-        + '   - Status: %s\n' % self.presence.description()
-        )
+                + '   - Profile Picture: %s\n' % self.imageUri
+                + '   - Status: %s\n' % self.presence.description()
+                )
+
 
 class Friend(User):
     def __init__(self, f):
@@ -306,26 +318,28 @@ class Friend(User):
 
     def description(self):
         return ('%s (id: %s, nsaId: %s):\n' % (self.name, self.id, self.nsaId)
-        + '   - Profile Picture: %s\n' % self.imageUri
-        + '   - Is Favorite: %s\n' % self.isFavoriteFriend
-        + '   - Friend Creation Date: %s\n' % self.friendCreatedAt
-        + '   - Status: %s\n' % self.presence.description()
-        )
+                + '   - Profile Picture: %s\n' % self.imageUri
+                + '   - Is Favorite: %s\n' % self.isFavoriteFriend
+                + '   - Friend Creation Date: %s\n' % self.friendCreatedAt
+                + '   - Status: %s\n' % self.presence.description()
+                )
+
 
 class FriendList():
     def __init__(self):
-        self.route = '/v3/Friend/List' # Define API route
+        self.route = '/v3/Friend/List'  # Define API route
 
-        self.friendList = [] # List of Friend object(s)
+        self.friendList = []  # List of Friend object(s)
 
-    def populateList(self, API:API):
+    def populateList(self, API: API):
         response = API.makeRequest(self.route)
         try:
             arr = json.loads(response.text)['result']['friends']
         except Exception as e:
             log('Failure with authorization: %s\Friends returns %s' % (e, response.text))
             raise e
-        self.friendList = [ Friend(friend) for friend in arr ]
+        self.friendList = [Friend(friend) for friend in arr]
+
 
 class Presence():
     def __init__(self, f):
@@ -336,8 +350,9 @@ class Presence():
 
     def description(self):
         return ('%s (updatedAt: %s, logoutAt: %s)\n' % (self.state, self.updatedAt, self.logoutAt)
-        + '   - Game: %s' % self.game.description()
-        )
+                + '   - Game: %s' % self.game.description()
+                )
+
 
 class Game():
     def __init__(self, f):
@@ -350,11 +365,12 @@ class Game():
 
     def description(self):
         return ('%s (sysDescription: %s)\n' % (self.name, self.sysDescription)
-        + '   - Game Icon: %s\n' % self.imageUri
-        + '   - Shop Uri: %s\n' % self.shopUri
-        + '   - Total Play Time: %s\n' % self.totalPlayTime
-        + '   - First Played At: %s' % self.firstPlayedAt
-        )
+                + '   - Game Icon: %s\n' % self.imageUri
+                + '   - Shop Uri: %s\n' % self.shopUri
+                + '   - Total Play Time: %s\n' % self.totalPlayTime
+                + '   - First Played At: %s' % self.firstPlayedAt
+                )
+
 
 class Session():
     def __init__(self):
@@ -399,11 +415,11 @@ class Session():
         headers = self.headers
         headers.update({
             'Accept-Language': 'en-US',
-            'Accept':          'application/json',
-            'Content-Type':    'application/x-www-form-urlencoded',
-            'Content-Length':  '540',
-            'Host':            'accounts.nintendo.com',
-            'Connection':      'Keep-Alive',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': '540',
+            'Host': 'accounts.nintendo.com',
+            'Connection': 'Keep-Alive',
         })
         body = {
             'client_id': client_id,

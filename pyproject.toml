@@ -1,0 +1,4 @@
+[tool.autopep8]
+ignore = ["E251", "E501"]
+in-place = true
+recursive = true

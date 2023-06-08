@@ -102,9 +102,11 @@ QScrollBar::add-line, QScrollBar::sub-line {
     border: none;
 }
 """
-darkMode = style.replace('#F2F2F2','#2b2828').replace('#dfdfdf', '#383333').replace('#ffffff', '#e6e6e6').replace('#fff', '#1e2024').replace('#393939', '#c4bebe').replace('#3c3c3c', '#fff')
+darkMode = style.replace('#F2F2F2', '#2b2828').replace('#dfdfdf', '#383333').replace('#ffffff', '#e6e6e6').replace('#fff', '#1e2024').replace('#393939', '#c4bebe').replace('#3c3c3c', '#fff')
 # self.mode = 1 is for token
 # self.mode = 2 is for full
+
+
 def getPath(path):
     try:
         root = sys._MEIPASS
@@ -112,16 +114,22 @@ def getPath(path):
         root = os.path.abspath('.')
 
     return os.path.join(root, path)
+
+
 def loadPix(url):
     _pixmap = QPixmap()
     _pixmap.loadFromData(requests.get(url).content)
     return _pixmap
-def up(_label,image):
+
+
+def up(_label, image):
     _label.clear()
-    if isinstance(image,str):
+    if isinstance(image, str):
         image = loadPix(image)
     _label.setPixmap(image)
-def timeSince(epoch:int):
+
+
+def timeSince(epoch: int):
     if epoch == 0:
         return ''
     offset = time.time() - epoch
@@ -140,25 +148,36 @@ def timeSince(epoch:int):
         else:
             break
     return 'Last online %s %s%s ago' % (int(offset), unit, ('' if int(offset) == 1 else 's'))
+
+
 applicationPath = getAppPath()
-settingsFile = os.path.join(applicationPath,'settings.txt')
+settingsFile = os.path.join(applicationPath, 'settings.txt')
 settings = {
     'dark': False,
     'startInSystemTray': False,
     'startOnLaunch': False,
 }
 userSelected = ''
+
+
 def writeSettings():
-    try:os.mkdir(os.path.dirname(settingsFile))
-    except:pass
+    try:
+        os.mkdir(os.path.dirname(settingsFile))
+    except:
+        pass
     with open(settingsFile, 'w') as file:
         file.write(json.dumps(settings))
+
+
 def readSettings():
     global settings
     with open(settingsFile, 'r') as file:
         settings = json.loads(file.read())
+
+
 friendTime = time.time()
 iconsStorage = {}
+
 
 class GUI(Ui_MainWindow):
     def __init__(self, MainWindow):
@@ -177,12 +196,12 @@ class GUI(Ui_MainWindow):
         if self.mode == 2:
             self.updateFriends()
 
-    def setVisibility(self,mode):
+    def setVisibility(self, mode):
         global settings
         settings['startInSystemTray'] = mode
         writeSettings()
 
-    def setLaunchMode(self,mode):
+    def setLaunchMode(self, mode):
         global settings
         try:
             if platform.system() == 'Windows':
@@ -196,33 +215,33 @@ class GUI(Ui_MainWindow):
                 Shortcut.IconLocation = sys.executable
                 if not isScriptBundled:
                     runningPath = os.getcwd()
-                    Shortcut.IconLocation = os.path.join(runningPath,"client\icon.ico")
+                    Shortcut.IconLocation = os.path.join(runningPath, "client\icon.ico")
                     Shortcut.Arguments = os.path.abspath(__file__)
                 if settings['startOnLaunch'] == False:
                     Shortcut.save()
                 elif settings['startOnLaunch'] == True:
                     os.remove(os.path.join(StartupFolder, "NSO-RPC.lnk"))
 
-            elif platform.system() == "Linux": # This is where Linux code should go
+            elif platform.system() == "Linux":  # This is where Linux code should go
                 linuxServiceFile = [
-                        "[Unit]",
-                        "Description=NSO-RPC Autostart",
-                        "PartOf=graphical-session.target",
-                        "",
-                        "[Service]",
-                        "Type=simple",
-                        "StandardOutput=journal",
-                        "WorkingDirectory="+os.getcwd(),
-                        "ExecStart="+" ".join([sys.executable, os.path.abspath(__file__)]),
-                        "",
-                        "[Install]",
-                        "WantedBy=graphical-session.target"
-                    ]
+                    "[Unit]",
+                    "Description=NSO-RPC Autostart",
+                    "PartOf=graphical-session.target",
+                    "",
+                    "[Service]",
+                    "Type=simple",
+                    "StandardOutput=journal",
+                    "WorkingDirectory=" + os.getcwd(),
+                    "ExecStart=" + " ".join([sys.executable, os.path.abspath(__file__)]),
+                    "",
+                    "[Install]",
+                    "WantedBy=graphical-session.target"
+                ]
                 linuxServicePath = os.path.expanduser('~/.local/share/systemd/user')
                 if not os.path.exists(linuxServicePath):
                     os.makedirs(linuxServicePath)
                 if settings['startOnLaunch'] == False:
-                    with open(os.path.join(linuxServicePath, "NSO-RPC.service"),'w') as out:
+                    with open(os.path.join(linuxServicePath, "NSO-RPC.service"), 'w') as out:
                         out.writelines(line + "\n" for line in linuxServiceFile)
                         out.close()
                     os.system('systemctl --user daemon-reload && systemctl --user enable NSO-RPC.service')
@@ -236,32 +255,32 @@ class GUI(Ui_MainWindow):
                 # Rebuild the path if we're running inside Downloads (This assumes that only Downloads can have /private/var/folders)
                 if applicationPath.startswith("/private"):
                     applicationPathTmp = applicationPath.split("/")
-                    applicationPathTmp = applicationPathTmp[len(applicationPathTmp)-4:len(applicationPathTmp)]
+                    applicationPathTmp = applicationPathTmp[len(applicationPathTmp) - 4:len(applicationPathTmp)]
                     applicationPath = os.path.join(os.path.expanduser('~/Downloads'), "/".join(applicationPathTmp))
 
                 macOSplist = [
-                        '<?xml version="1.0" encoding="UTF-8"?>',
-                        '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
-                        '<plist version="1.0">',
-                        '	<dict>',
-                        '		<key>Label</key>',
-                        '		<string>NSO-RPC.app</string>',
-                        '		<key>Program</key>',
-                        '		<string>'+applicationPath+'</string>',
-                        '		<key>RunAtLoad</key>',
-                        '		<true/>',
-                        '	</dict>',
-                        '</plist>'
+                    '<?xml version="1.0" encoding="UTF-8"?>',
+                    '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+                    '<plist version="1.0">',
+                    '	<dict>',
+                    '		<key>Label</key>',
+                    '		<string>NSO-RPC.app</string>',
+                    '		<key>Program</key>',
+                    '		<string>' + applicationPath + '</string>',
+                    '		<key>RunAtLoad</key>',
+                    '		<true/>',
+                    '	</dict>',
+                    '</plist>'
                 ]
                 macOSLaunchAgentPath = os.path.expanduser('~/Library/LaunchAgents')
                 if not os.path.exists(macOSLaunchAgentPath):
                     os.makedirs(macOSLaunchAgentPath)
                 if settings['startOnLaunch'] == False:
-                    with open(os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"),'w') as out:
+                    with open(os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"), 'w') as out:
                         out.writelines(line + "\n" for line in macOSplist)
                         out.close()
                 else:
-                    os.system('rm '+ os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"))
+                    os.system('rm ' + os.path.join(macOSLaunchAgentPath, "NSO-RPC.plist"))
             else:
                 raise Exception('not implemented yet')
             settings['startOnLaunch'] = mode
@@ -301,8 +320,8 @@ class GUI(Ui_MainWindow):
 
         self.pushButton_7.setCursor(QCursor(Qt.PointingHandCursor))
         self.pushButton_8.setCursor(QCursor(Qt.PointingHandCursor))
-        self.pushButton_7.clicked.connect(lambda *args:self.updateProfile(True))
-        self.pushButton_8.clicked.connect(lambda *args:self.updateProfile(False))
+        self.pushButton_7.clicked.connect(lambda *args: self.updateProfile(True))
+        self.pushButton_8.clicked.connect(lambda *args: self.updateProfile(False))
 
         self.namePlate = self.stackedWidget.findChild(QLabel, 'label_4')
         self.namePlate.setAlignment(Qt.AlignCenter)
@@ -319,7 +338,7 @@ class GUI(Ui_MainWindow):
             if i == 3:
                 i += 2
             group = self.stackedWidget.findChild(QGroupBox, 'groupBox_%s' % (i + 3))
-            group.setStyleSheet('background-color: #%s; border: 1px solid #%s; border-radius: 8px;' % (('fff','dfdfdf') if not settings['dark'] else ('1c1b1b','121111')))
+            group.setStyleSheet('background-color: #%s; border: 1px solid #%s; border-radius: 8px;' % (('fff', 'dfdfdf') if not settings['dark'] else ('1c1b1b', '121111')))
 
             if i == 5:
                 i -= 2
@@ -345,22 +364,22 @@ class GUI(Ui_MainWindow):
 
         self.presenceText = self.stackedWidget.findChild(QLabel, 'label_7')
         self.presenceState = self.stackedWidget.findChild(QLabel, 'label_10')
-        [ x.setStyleSheet('background-color: transparent;') for x in (self.presenceText,self.presenceState) ]
+        [x.setStyleSheet('background-color: transparent;') for x in (self.presenceText, self.presenceState)]
 
         self.presenceDesc = self.stackedWidget.findChild(QLabel, 'label_9')
         self.presenceDesc.setAlignment(Qt.AlignCenter)
 
         # Settings
         self.toggleDiscord = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggleDiscord.setGeometry(QRect(101,0,60,41))
+        self.toggleDiscord.setGeometry(QRect(101, 0, 60, 41))
         self.toggleStatus = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggleStatus.setGeometry(QRect(101,40,60,41))
+        self.toggleStatus.setGeometry(QRect(101, 40, 60, 41))
         self.toggleTheme = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.toggleTheme.setGeometry(QRect(101,80,60,41))
+        self.toggleTheme.setGeometry(QRect(101, 80, 60, 41))
         self.startInSystemTray = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.startInSystemTray.setGeometry(QRect(101,120,60,41))
+        self.startInSystemTray.setGeometry(QRect(101, 120, 60, 41))
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
-        self.startOnLaunch.setGeometry(QRect(101,160,60,41))
+        self.startOnLaunch.setGeometry(QRect(101, 160, 60, 41))
 
         # [MacOS] Hide Buttons if running app.py directly.
         if platform.system() == "Darwin" and not isScriptBundled:
@@ -450,17 +469,19 @@ class GUI(Ui_MainWindow):
 
     def updatePresence(self, user):
         global friendTime, iconsStorage, userSelected
+
         def mousePressEvent(event = None):
             pass
+
         def openLink(url):
             def e(event = None):
                 event.ignore()
                 webbrowser.open(url)
-            return lambda event : e(event)
+            return lambda event: e(event)
 
         # If the player is the user
         try:
-            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ','-')
+            text = 'Friend Code: SW-%s' % str(user.links.get('friendCode').get('id')).replace(' ', '-')
             state = ''
             self.pushButton_7.setEnabled(False)
             self.pushButton_8.setEnabled(False)
@@ -503,7 +524,7 @@ class GUI(Ui_MainWindow):
 
         # Set presence image and game data
         if user.presence.game.name:
-            threading.Thread(target = up, args = (self.presenceImage,user.presence.game.imageUri), daemon = True).start()
+            threading.Thread(target = up, args = (self.presenceImage, user.presence.game.imageUri), daemon = True).start()
 
             self.presenceText.setText(user.presence.game.name)
             self.presenceText.adjustSize()
@@ -539,7 +560,7 @@ class GUI(Ui_MainWindow):
                     msg = 'Try running NSO-RPC with Administrator.'
                 elif 'Could not find Discord' in str(ret[1]) or 'Connection refused' in str(ret[1]):
                     msg = 'Try opening Discord first.'
-                self.label_12.setFixedWidth(self.label_12.width()+120)
+                self.label_12.setFixedWidth(self.label_12.width() + 120)
                 self.label_12.setFixedHeight(36)
                 self.label_12.setText("<a style='color: orange;'>Unable to connect to Discord!<br>%s</a>" % msg)
                 self.toggleDiscord.setHidden(True)
@@ -577,7 +598,7 @@ class GUI(Ui_MainWindow):
                             if not client.api.friends[n].nsaId in iconsStorage:
                                 iconsStorage[client.api.friends[n].nsaId] = loadPix(client.api.friends[n].imageUri)
                             client.api.friends[n].image = iconsStorage[client.api.friends[n].nsaId]
-                            up(item,client.api.friends[n].image)
+                            up(item, client.api.friends[n].image)
                         i += 1
                     n += 1
             except:
@@ -591,13 +612,14 @@ class GUI(Ui_MainWindow):
         j = 0
         n = 0
         overlay = QGroupBox()
+
         def openFriend(i):
             def e(event = None):
                 event.ignore()
                 self.updatePresence(client.api.friends[i])
                 self.switchHome()
                 client.gui = False
-            return lambda event : e(event)
+            return lambda event: e(event)
         for i in range(len(client.api.friends)):
             overlay.move(0, 0)
             overlay.setStyleSheet('background-color: transparent; border-radius: 0px; border: 0px;')
@@ -611,7 +633,7 @@ class GUI(Ui_MainWindow):
 
             friend = client.api.friends[i]
             groupBox = QGroupBox(overlay)
-            groupBox.setStyleSheet('background-color: #%s; border: 1px solid %s; border-radius: 8px;' % (('fff','#dfdfdf') if not settings['dark'] else ('212020','transparent')))
+            groupBox.setStyleSheet('background-color: #%s; border: 1px solid %s; border-radius: 8px;' % (('fff', '#dfdfdf') if not settings['dark'] else ('212020', 'transparent')))
 
             groupBox.setGeometry(QRect(10 + (j * 91), 0, 81, 111))
             groupBox.setFixedSize(81, 111)
@@ -633,7 +655,7 @@ class GUI(Ui_MainWindow):
             overlay.setFixedSize(81 * 4 + (4 * 10), 111)
             layout.addWidget(overlay)
             layout.addWidget(QSplitter(Qt.Horizontal))
-        layout.addItem(QSpacerItem(0,600))
+        layout.addItem(QSpacerItem(0, 600))
 
         page.setLayout(layout)
 
@@ -680,6 +702,7 @@ class GUI(Ui_MainWindow):
             else:
                 self.toggleDiscord.setChecked(False)
 
+
 class SystemTrayApp(QSystemTrayIcon):
     def __init__(self, icon, parent):
         QSystemTrayIcon.__init__(self, icon, parent)
@@ -697,7 +720,7 @@ class SystemTrayApp(QSystemTrayIcon):
         tray.hide()
         MainWindow.show()
 
-    def windowsLightMode(): #https://stackoverflow.com/a/65349866
+    def windowsLightMode():  # https://stackoverflow.com/a/65349866
         try:
             import winreg
         except ImportError:
@@ -717,6 +740,7 @@ class SystemTrayApp(QSystemTrayIcon):
             except OSError:
                 break
         return False
+
 
 if __name__ == '__main__':
     if os.path.isfile(settingsFile):
@@ -748,7 +772,7 @@ if __name__ == '__main__':
 
     threading.Thread(target = clientBackgroundCatcher, daemon = True).start()
 
-    if settings.get("startInSystemTray")==True:
+    if settings.get("startInSystemTray") == True:
         tray.show()
     else:
         MainWindow.show()
