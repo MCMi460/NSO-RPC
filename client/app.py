@@ -393,7 +393,6 @@ class GUI(Ui_MainWindow):
             sys.exit('User closed')
         event.ignore()
         self.MainWindow.hide()
-        tray.show()
 
     def grabToken(self):
         global session_token, user_lang, targetID
@@ -459,6 +458,7 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
 
+        # Check Discord Errors
         self.checkDiscordError()
 
         # Set home
@@ -717,7 +717,6 @@ class SystemTrayApp(QSystemTrayIcon):
         self.setContextMenu(menu)
 
     def switch(self):
-        tray.hide()
         MainWindow.show()
 
     def windowsLightMode():  # https://stackoverflow.com/a/65349866
@@ -775,6 +774,7 @@ if __name__ == '__main__':
     if settings.get("startInSystemTray") == True:
         tray.show()
     else:
+        tray.show()
         MainWindow.show()
 
     sys.exit(app.exec_())
