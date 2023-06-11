@@ -4,6 +4,4 @@ qtpy
 autopep8
 qtwidgets @ git+https://github.com/MCMi460/python-qtwidgets@e0fdba848725749775aceefc5d29e15865667bf0
 
-pyinstaller==5.10.1
 charset_normalizer<3.0
-pyinstaller-hooks-contrib==2023.2
