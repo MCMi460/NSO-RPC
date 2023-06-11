@@ -47,6 +47,7 @@ class Discord():
             # Attempt to connect to Discord. Will wait until it connects
             try:
                 self.rpc.connect()
+                print(log("Successfully Connected to Discord."))
                 break
             except Exception as e:
                 fails += 1
@@ -102,7 +103,11 @@ class Discord():
                     state = 'Played for %s hours or more' % (int(presence.game.totalPlayTime / 60 / 5) * 5)
                     if presence.game.totalPlayTime / 60 < 5:
                         state = 'Played for a little while'
-                self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start, buttons = [{'label': 'Nintendo eShop', 'url': presence.game.shopUri},])
+                try:
+                    self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start, buttons = [{'label': 'Nintendo eShop', 'url': presence.game.shopUri},])
+                except pypresence.exceptions.PipeClosed:
+                    print(log("Discord pipe is closed, Attempting to reconnect."))
+                    self.connect()
             else:
                 self.currentGame = None
                 self.rpc.clear()
