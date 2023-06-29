@@ -1,11 +1,11 @@
-name: 'Build NSO-RPC'
+name: 'Build NSO-RPC - x86_64'
 on:
   release:
     types: [published]
 
 jobs:
-  build:
-    name: 'Build NSO-RPC'
+  build-x86_64:
+    name: 'Build NSO-RPC - x86_64'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -44,7 +44,7 @@ jobs:
       run: |
         cd scripts &&
         python -m pip install pyqt6 &&
-        ./build.sh &&
+        bash ./build.sh &&
         cd ../client/dist &&
         ln -s /Applications "Applications (admin)" &&
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
@@ -58,9 +58,36 @@ jobs:
           client/dist/mac-installer.dmg
           client/dist/mac-portable.zip
 
+  build-universal2:
+    name: 'Build NSO-RPC - Universal2'
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    # MacOS Build
+    - name: "Install Python 3.10.11 and build NSO-RPC"
+      run: |
+        curl https://www.python.org/ftp/python/3.10.11/python-3.10.11-macos11.pkg -o python-3.10.11-macos11.pkg
+        sudo installer -verbose -pkg python-3.10.11-macos11.pkg -target / &&
+        python3.10 -m pip install PyQt6 &&
+        cd scripts/macos-universal2 &&
+        bash ./build.sh &&
+        python3 debloat-qt.py &&
+        cd ../../client/dist &&
+        ln -s /Applications "Applications (admin)" &&
+        hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
+        zip -yr mac-universal2-portable.zip NSO-RPC.app/
+
+    - name: "Upload NSO-RPC Universal2 Build"
+      uses: softprops/action-gh-release@v0.1.15
+      with:
+        files: |
+          client/dist/mac-universal2-installer.dmg
+          client/dist/mac-universal2-portable.zip
+
   get-hashes:
     runs-on: "ubuntu-latest"
-    needs: build
+    needs: ["build-x86_64", "build-universal2"]
     steps:
       - name: "Generate checksums.txt"
         uses: MCJack123/ghaction-generate-release-hashes@v4
