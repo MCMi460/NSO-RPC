@@ -758,7 +758,8 @@ if __name__ == '__main__':
         if not bool(SystemTrayApp.windowsLightMode()):
             iconFile = 'taskBarLight.png'
     tray = SystemTrayApp(QIcon(getPath(iconFile)), MainWindow)
-    app.setWindowIcon(QIcon(getPath("icon.png")))
+    if platform.system() != 'Darwin':
+        app.setWindowIcon(QIcon(getPath("icon.png")))
     window.setupUi(MainWindow)
     window.selfService()
 
