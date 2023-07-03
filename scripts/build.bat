@@ -30,7 +30,7 @@ if "%PYQT_PACKAGE%"=="" (
 echo Building with %PYQT_PACKAGE%
 
 REM Install requirements
-python -m pip install -r ./requirements.txt pypiwin32 winshell pyinstaller==5.10.1 pyinstaller-hooks-contrib==2023.2
+python -m pip install -r ../client/requirements.txt pypiwin32 winshell pyinstaller>=5.12 pyinstaller-hooks-contrib==2023.4
 
 REM Build the executable using PyInstaller
 python -m PyInstaller --onefile --clean --noconsole --exclude-module autopep8 --noupx --add-data "*.png;." --icon=icon.ico --name=NSO-RPC ..\client\app.py

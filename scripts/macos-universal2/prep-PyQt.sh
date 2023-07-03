@@ -2,7 +2,7 @@
 # Provided by @spotlightishere on Github
 # https://github.com/MCMi460/NSO-RPC/pull/86#issuecomment-1605700512
 
-alias python3=python3.10
+alias python3=python3.11
 
 # Download and unpack
 python3 -m pip download --only-binary=:all: --platform=macosx_13_0_x86_64 PyQt6_Qt6
@@ -28,5 +28,5 @@ export -f merge_frameworks
 find universal -perm +111 -type f -exec sh -c 'merge_frameworks "$1"' _ {} \;
 python3 -m wheel pack universal/PyQt6_*
 
-# Finally, install our universal python3.10 -m wheel.
+# Finally, install our universal python3.11 -m wheel.
 python3 -m pip install PyQt6_*universal2.whl --force-reinstall
