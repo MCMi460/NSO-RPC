@@ -380,7 +380,7 @@ class Session():
         }
         self.Session = requests.Session()
 
-    def login(self, receiveInput):
+    def login(self, receiveInput, *, altLink = None):
         state = base64.urlsafe_b64encode(os.urandom(36))
         verify = base64.urlsafe_b64encode(os.urandom(32))
         authHash = hashlib.sha256()
@@ -400,8 +400,13 @@ class Session():
         }
         response = self.Session.get(url, headers = self.headers, params = params)
 
-        webbrowser.open(response.history[0].url)
+        try:
+            webbrowser.open(response.history[0].url)
+        except Exception as e:
+            print(log(e))
         print('Open this link: %s' % response.history[0].url)
+        if altLink:
+            altLink('<a href="%s" style="color: cyan;">Click here if your browser didn\'t open</a>' % response.history[0].url)
         tokenPattern = re.compile(r'(eyJhbGciOiJIUzI1NiJ9\.[a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]*)')
         code = tokenPattern.findall(receiveInput())[0]
 

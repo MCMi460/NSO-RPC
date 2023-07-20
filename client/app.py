@@ -31,6 +31,7 @@ try:
 except Exception as e:
     log(e)
     raise e
+altLink = None
 
 # Helpful Wrapper code for handling autostart dependencies
 if getattr(sys, 'frozen', False):
@@ -381,6 +382,9 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startOnLaunch.setGeometry(QRect(101, 160, 60, 41))
 
+        self.fakePushButton = QPushButton()
+        self.fakePushButton.clicked.connect(lambda a : self.label_22.setText(altLink))
+
         # [MacOS] Hide Buttons if running app.py directly.
         if platform.system() == "Darwin" and not isScriptBundled:
             self.startOnLaunch.setHidden(True)
@@ -394,10 +398,16 @@ class GUI(Ui_MainWindow):
         event.ignore()
         self.MainWindow.hide()
 
+    def altLink(self, text):
+        # I hate Qt's inability to accept GUI changes from separate threads
+        global altLink
+        altLink = text
+        self.fakePushButton.clicked.emit()
+
     def grabToken(self):
         global session_token, user_lang, targetID
         try:
-            session_token = self.session.run(*self.session.login(self.waitUntil))
+            session_token = self.session.run(*self.session.login(self.waitUntil, altLink = self.altLink))
             user_lang = self.comboBox.currentText()
             client.createCTX(session_token, user_lang, None, version)
         except Exception as e:
