@@ -18,6 +18,7 @@ build/
 dist/
 setup.py
 *.spec
+client/version.txt
 
 # Tests
 test*.*

@@ -212,7 +212,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
          <x>130</x>
          <y>20</y>
          <width>71</width>
-         <height>21</height>
+         <height>61</height>
         </rect>
        </property>
        <property name="text">

@@ -17,6 +17,7 @@ app = QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
 app.setApplicationName("NSO-RPC")
 MainWindow = QMainWindow()
+
 # NSO Variables
 session_token, user_lang, targetID = getToken(False)
 version = getVersion()
@@ -159,6 +160,17 @@ settings = {
     'startOnLaunch': False,
 }
 userSelected = ''
+
+# Get Version Info
+try:
+    with open(getPath('version.txt'), 'r') as file:
+        versionTag = file.read().rstrip()
+        try:
+            versionTag = versionTag.split('-', 1)
+        except ValueError:
+            pass
+except:
+    pass
 
 
 def writeSettings():
@@ -383,7 +395,7 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.setGeometry(QRect(101, 160, 60, 41))
 
         self.fakePushButton = QPushButton()
-        self.fakePushButton.clicked.connect(lambda a : self.label_22.setText(altLink))
+        self.fakePushButton.clicked.connect(lambda a: self.label_22.setText(altLink))
 
         # [MacOS] Hide Buttons if running app.py directly.
         if platform.system() == "Darwin" and not isScriptBundled:
@@ -391,6 +403,13 @@ class GUI(Ui_MainWindow):
             self.label_19.setHidden(True)
             self.startInSystemTray.setHidden(True)
             self.label_17.setHidden(True)
+
+        # Version Details
+        if versionTag is not None:
+            if len(versionTag) >= 2:
+                self.label_5.setText("NSO-RPC" + '\n' + versionTag[0] + "\n" + versionTag[1])
+            else:
+                self.label_5.setText("NSO-RPC" + '\n' + versionTag[0])
 
     def closeEvent(self, event = None):
         if self.mode == 1:
