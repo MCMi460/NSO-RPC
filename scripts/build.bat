@@ -30,10 +30,13 @@ if "%PYQT_PACKAGE%"=="" (
 echo Building with %PYQT_PACKAGE%
 
 REM Install requirements
-python -m pip install -r ../client/requirements.txt pypiwin32 winshell pyinstaller>=5.12 pyinstaller-hooks-contrib==2023.4
+python -m pip install -r ../client/requirements.txt GitPython pypiwin32 winshell pyinstaller>=5.12 pyinstaller-hooks-contrib==2023.4
+
+REM Generate version.txt
+python _version.py
 
 REM Build the executable using PyInstaller
-python -m PyInstaller --onefile --clean --noconsole --exclude-module autopep8 --noupx --add-data "*.png;." --icon=icon.ico --name=NSO-RPC ..\client\app.py
+python -m PyInstaller --onefile --clean --noconsole --exclude-module autopep8 --noupx --add-data "*.png;." --add-data "version.txt;." --icon=icon.ico --name=NSO-RPC ..\client\app.py
 
 REM Open the 'dist' directory
 start .\dist

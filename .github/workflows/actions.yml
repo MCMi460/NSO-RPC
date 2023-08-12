@@ -64,7 +64,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    # MacOS Build
+    # MacOS Universal Build
     - name: "Install Python 3.11.4 and build NSO-RPC"
       run: |
         curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o python-3.11.4-macos11.pkg

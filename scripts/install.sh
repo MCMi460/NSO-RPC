@@ -116,7 +116,8 @@ function install_python_bindings {
 install_python_bindings
 
 cd ../client
-python3 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt GitPython
+python3 _version.py
 executableDir='/opt/NSO-RPC/'
 
 # Check if installation directory already exists
