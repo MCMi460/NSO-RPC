@@ -2,8 +2,6 @@
 # Provided by @spotlightishere on Github
 # https://github.com/MCMi460/NSO-RPC/pull/86#issuecomment-1605700512
 
-alias python3=python3.11
-
 # Download and unpack
 python3 -m pip download --only-binary=:all: --platform=macosx_13_0_x86_64 PyQt6_Qt6
 python3 -m pip download --only-binary=:all: --platform=macosx_13_0_arm64 PyQt6_Qt6

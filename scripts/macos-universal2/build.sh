@@ -1,5 +1,5 @@
 #!/bin/bash
-python3 -m pip install wheel
+python3 -m pip install wheel PyQt6
 bash prep-PyQt.sh
 cd ../../client
 python3 -m pip install -r requirements.txt py2app

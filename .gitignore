@@ -12,6 +12,10 @@ __pycache__/
 
 # Qt
 *.autosave
+arm64/
+PyQt6_Qt6*.whl
+universal/
+x86_64/
 
 # Compilation
 build/

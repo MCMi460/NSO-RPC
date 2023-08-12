@@ -21,7 +21,7 @@ jobs:
     - name: "Build"
       if: matrix.os == 'windows-latest'
       run: |
-        cd scripts && 
+        cd scripts &&
         python -m pip install pyqt6 &&
         ./build.bat
 
@@ -69,10 +69,9 @@ jobs:
       run: |
         curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o python-3.11.4-macos11.pkg
         sudo installer -verbose -pkg python-3.11.4-macos11.pkg -target / &&
-        python3.11 -m pip install PyQt6 &&
+        alias python3=python3.11
         cd scripts/macos-universal2 &&
         bash ./build.sh &&
-        python3 debloat-qt.py &&
         cd ../../client/dist &&
         ln -s /Applications "Applications (admin)" &&
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
