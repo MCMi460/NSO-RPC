@@ -168,10 +168,9 @@ try:
         try:
             versionTag = versionTag.split('-', 1)
         except ValueError:
-            pass
+            versionTag = [versionTag, '']
 except:
-    pass
-
+    versionTag = ['', '']
 
 def writeSettings():
     try:
@@ -405,11 +404,7 @@ class GUI(Ui_MainWindow):
             self.label_17.setHidden(True)
 
         # Version Details
-        if versionTag is not None:
-            if len(versionTag) >= 2:
-                self.label_5.setText("NSO-RPC" + '\n' + versionTag[0] + "\n" + versionTag[1])
-            else:
-                self.label_5.setText("NSO-RPC" + '\n' + versionTag[0])
+        self.label_5.setText("NSO-RPC\n" + '\n'.join(versionTag))
 
     def closeEvent(self, event = None):
         if self.mode == 1:

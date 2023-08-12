@@ -223,7 +223,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
        <property name="geometry">
         <rect>
          <x>100</x>
-         <y>20</y>
+         <y>24</y>
          <width>21</width>
          <height>21</height>
         </rect>

@@ -79,7 +79,7 @@ class Ui_MainWindow(object):
         self.label_5.setGeometry(QtCore.QRect(130, 20, 71, 61))
         self.label_5.setObjectName("label_5")
         self.label_6 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_6.setGeometry(QtCore.QRect(100, 20, 21, 21))
+        self.label_6.setGeometry(QtCore.QRect(100, 24, 21, 21))
         self.label_6.setText("")
         self.label_6.setObjectName("label_6")
         self.groupBox_3 = QtWidgets.QGroupBox(self.groupBox_6)
