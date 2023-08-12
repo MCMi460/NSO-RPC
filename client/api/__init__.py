@@ -12,35 +12,51 @@ import platform
 import hashlib
 import re
 import pickle
+import re
 
 
 def getAppPath():
-    # If "NSO-RPC_Data" folder exists, assume the user wants to run NSO-RPC in "Portable mode".
-    loc = os.getcwd()
-    if sys.platform.startswith('darwin') and getattr(sys, 'frozen', False): # Cursed location hack that could be one line with regex probably
-        loc = os.path.abspath(loc).split('.app/Contents/')
-        if len(loc) > 1:
-            loc = '.app'.join(loc[:-1]).split('/')[:-1]
-            loc[0] = '/' + loc[0]
-        loc = os.path.join(*loc)
-    if os.path.isdir(os.path.join(loc, 'NSO-RPC_Data')):
-        return os.path.join(loc, 'NSO-RPC_Data')
+    application_path = ""
 
-    applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
+    # Check for macOS platform and NSO-RPC freeze status
+    if sys.platform.startswith('darwin') and hasattr(sys, 'frozen') and sys.frozen == 'macosx_app':
+        app_root_folder = os.path.dirname(re.search(r'(.*/NSO-RPC\.app)/', os.path.abspath(__file__)).group(1))
+
+        # If the path starts with "/private", assume NSO-RPC is in Downloads folder.
+        if app_root_folder.startswith("/private"):
+            applicationPathTmp = app_root_folder.split("/")
+            applicationPathTmp = applicationPathTmp[len(applicationPathTmp) - 4:len(applicationPathTmp)]
+            portable_data_path = os.path.join(os.path.expanduser('~/Downloads'), *applicationPathTmp, "NSO-RPC_Data")
+            if os.path.isdir(portable_data_path):
+                return portable_data_path
+
+        # Check if NSO-RPC_Data exists
+        potential_data_path = os.path.join(app_root_folder, 'NSO-RPC_Data')
+        if os.path.isdir(potential_data_path):
+            return potential_data_path
+        else:
+            return os.path.expanduser('~/Documents/NSO-RPC')
+
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
     # However os.path.expanduser does not actually check and assumes its in the default location.
     # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
-    if platform.system() == 'Windows':
+    elif platform.system() == 'Windows':
         try:
             import ctypes.wintypes
             CSIDL_PERSONAL = 5  # My Documents
             SHGFP_TYPE_CURRENT = 0  # Get current, not default value
             buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
             ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
-            applicationPath = os.path.join(buf.value, 'NSO-RPC')
+            application_path = os.path.join(buf.value, 'NSO-RPC')
         except:
             pass
-    return applicationPath
+    else:
+        # Default path for other platforms
+        application_path = os.path.expanduser('~/Documents/NSO-RPC')
+
+    # Use Portable path if it exists, else use Default path
+    portable_data_path = os.path.join(application_path, 'NSO-RPC_Data')
+    return portable_data_path if os.path.isdir(portable_data_path) else application_path
 
 
 def log(info, time = time.time()):
