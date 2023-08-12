@@ -5,6 +5,7 @@ tempToken.*
 # App
 settings.*
 logs.*
+NSO-RPC_Data/
 
 # Python
 venv/

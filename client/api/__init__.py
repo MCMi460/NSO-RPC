@@ -16,8 +16,15 @@ import pickle
 
 def getAppPath():
     # If "NSO-RPC_Data" folder exists, assume the user wants to run NSO-RPC in "Portable mode".
-    if os.path.isdir(os.path.join(os.getcwd(), 'NSO-RPC_Data')):
-        return os.path.join(os.getcwd(), 'NSO-RPC_Data')
+    loc = os.getcwd()
+    if sys.platform.startswith('darwin') and getattr(sys, 'frozen', False): # Cursed location hack that could be one line with regex probably
+        loc = os.path.abspath(loc).split('.app/Contents/')
+        if len(loc) > 1:
+            loc = '.app'.join(loc[:-1]).split('/')[:-1]
+            loc[0] = '/' + loc[0]
+        loc = os.path.join(*loc)
+    if os.path.isdir(os.path.join(loc, 'NSO-RPC_Data')):
+        return os.path.join(loc, 'NSO-RPC_Data')
 
     applicationPath = os.path.expanduser('~/Documents/NSO-RPC')
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
