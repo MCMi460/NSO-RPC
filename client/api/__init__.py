@@ -12,23 +12,11 @@ import platform
 import hashlib
 import re
 import pickle
-import re
-
 
 def getAppPath():
-    application_path = ""
-
     # Check for macOS platform and NSO-RPC freeze status
     if sys.platform.startswith('darwin') and hasattr(sys, 'frozen') and sys.frozen == 'macosx_app':
         app_root_folder = os.path.dirname(re.search(r'(.*/NSO-RPC\.app)/', os.path.abspath(__file__)).group(1))
-
-        # If the path starts with "/private", assume NSO-RPC is in Downloads folder.
-        if app_root_folder.startswith("/private"):
-            applicationPathTmp = app_root_folder.split("/")
-            applicationPathTmp = applicationPathTmp[len(applicationPathTmp) - 4:len(applicationPathTmp)]
-            portable_data_path = os.path.join(os.path.expanduser('~/Downloads'), *applicationPathTmp, "NSO-RPC_Data")
-            if os.path.isdir(portable_data_path):
-                return portable_data_path
 
         # Check if NSO-RPC_Data exists
         potential_data_path = os.path.join(app_root_folder, 'NSO-RPC_Data')
@@ -40,7 +28,8 @@ def getAppPath():
     # Windows allows you to move your UserProfile subfolders, Such as Documents, Videos, Music etc.
     # However os.path.expanduser does not actually check and assumes its in the default location.
     # This tries to correctly resolve the Documents path and fallbacks to default if it fails.
-    elif platform.system() == 'Windows':
+    application_path = os.path.expanduser('~/Documents/NSO-RPC')
+    if platform.system() == 'Windows':
         try:
             import ctypes.wintypes
             CSIDL_PERSONAL = 5  # My Documents
@@ -50,14 +39,10 @@ def getAppPath():
             application_path = os.path.join(buf.value, 'NSO-RPC')
         except:
             pass
-    else:
-        # Default path for other platforms
-        application_path = os.path.expanduser('~/Documents/NSO-RPC')
 
     # Use Portable path if it exists, else use Default path
-    portable_data_path = os.path.join(application_path, 'NSO-RPC_Data')
+    portable_data_path = os.path.join(os.getcwd(), 'NSO-RPC_Data')
     return portable_data_path if os.path.isdir(portable_data_path) else application_path
-
 
 def log(info, time = time.time()):
     path = getAppPath()
