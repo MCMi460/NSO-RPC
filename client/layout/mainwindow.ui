@@ -535,8 +535,8 @@ Please note that NSO-RPC requires two different Nintendo accounts.</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>385</width>
-          <height>599</height>
+          <width>381</width>
+          <height>597</height>
          </rect>
         </property>
        </widget>
@@ -619,6 +619,19 @@ Please note that NSO-RPC requires two different Nintendo accounts.</string>
        </property>
        <property name="text">
         <string>Start on Launch:</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_21">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>210</y>
+         <width>200</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Friend Code:</string>
        </property>
       </widget>
      </widget>

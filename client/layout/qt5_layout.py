@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 385, 599))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 381, 597))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.stackedWidget_2.addWidget(self.page_2)
@@ -196,6 +196,9 @@ class Ui_MainWindow(object):
         self.label_19 = QtWidgets.QLabel(self.page_3)
         self.label_19.setGeometry(QtCore.QRect(10, 170, 101, 21))
         self.label_19.setObjectName("label_19")
+        self.label_211 = QtWidgets.QLabel(self.page_3)
+        self.label_211.setGeometry(QtCore.QRect(10, 210, 200, 21))
+        self.label_211.setObjectName("label_211")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -227,6 +230,7 @@ class Ui_MainWindow(object):
         self.label_16.setText(_translate("MainWindow", "Dark Mode:"))
         self.label_17.setText(_translate("MainWindow", "Start Minimized:"))
         self.label_19.setText(_translate("MainWindow", "Start on Launch:"))
+        self.label_211.setText(_translate("MainWindow", "Friend Code:"))
 
 
 if __name__ == "__main__":
