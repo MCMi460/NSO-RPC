@@ -202,6 +202,14 @@ class Ui_MainWindow(object):
         self.label_19 = QtWidgets.QLabel(self.page_3)
         self.label_19.setGeometry(QtCore.QRect(10, 170, 101, 21))
         self.label_19.setObjectName("label_19")
+        self.label_23 = QtWidgets.QLabel(self.page_3)
+        self.label_23.setGeometry(QtCore.QRect(10, 440, 101, 41))
+        self.label_23.setWordWrap(True)
+        self.label_23.setObjectName("label_23")
+        self.friendCodeButton = QtWidgets.QPushButton(self.page_3)
+        self.friendCodeButton.setGeometry(QtCore.QRect(10, 490, 111, 41))
+        self.friendCodeButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.friendCodeButton.setObjectName("friendCodeButton")
         self.stackedWidget_2.addWidget(self.page_3)
         self.stackedWidget.addWidget(self.home)
 
@@ -234,6 +242,8 @@ class Ui_MainWindow(object):
         self.label_16.setText(_translate("MainWindow", "Dark Mode:"))
         self.label_17.setText(_translate("MainWindow", "Start Minimized:"))
         self.label_19.setText(_translate("MainWindow", "Start on Launch:"))
+        self.label_23.setText(_translate("MainWindow", "Show PFP on Discord:"))
+        self.friendCodeButton.setText(_translate("MainWindow", "Set friend code"))
 
 
 if __name__ == "__main__":

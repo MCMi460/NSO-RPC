@@ -25,6 +25,9 @@ class Discord():
         self.currentGame = None
         self.start = int(time.time())
 
+        self.smallImagePFP = False
+        self.friendcode = ''
+
     def createCTX(self, session_token, user_lang, targetID = None, version = None):
         try:
             if not version:
@@ -104,7 +107,21 @@ class Discord():
                     if presence.game.totalPlayTime / 60 < 5:
                         state = 'Played for a little while'
                 try:
-                    self.rpc.update(details = presence.game.name, large_image = presence.game.imageUri, large_text = presence.game.name, state = state, start = self.start, buttons = [{'label': 'Nintendo eShop', 'url': presence.game.shopUri},])
+                    kwargs = {
+                        'details': presence.game.name,
+                        'large_image': presence.game.imageUri,
+                        'large_text': presence.game.name,
+                        'state': state,
+                        'start': self.start,
+                        'buttons': [
+                            {'label': 'Nintendo eShop', 'url': presence.game.shopUri},
+                        ],
+                    }
+                    if self.smallImagePFP:
+                        kwargs['small_image'] = self.user.imageUri
+                        if self.friendcode:
+                            kwargs['small_text'] = self.user.name + ': ' + self.friendcode
+                    self.rpc.update(**kwargs)
                 except pypresence.exceptions.PipeClosed:
                     print(log("Discord pipe is closed, Attempting to reconnect."))
                     self.connect()

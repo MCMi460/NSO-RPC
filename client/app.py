@@ -158,6 +158,8 @@ settings = {
     'dark': False,
     'startInSystemTray': False,
     'startOnLaunch': False,
+    'smallImagePFP': True,
+    'friendcode': '',
 }
 userSelected = ''
 
@@ -184,8 +186,9 @@ def writeSettings():
 def readSettings():
     global settings
     with open(settingsFile, 'r') as file:
-        settings = json.loads(file.read())
-
+        all = json.loads(file.read())
+    for key in all.keys():
+        settings[key] = all.get(key)
 
 friendTime = time.time()
 iconsStorage = {}
@@ -301,6 +304,40 @@ class GUI(Ui_MainWindow):
             self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         writeSettings()
 
+    def setSmallPFP(self, mode):
+        global settings
+        settings['smallImagePFP'] = mode
+        writeSettings()
+        client.smallImagePFP = mode
+
+    def setFriendCode(self):
+        global settings
+        friendcode, ok = QInputDialog.getText(MainWindow, 'Friend Code', 'Enter your friendcode:\n(Ex: 1234-5678-9100)\n(Leave empty to clear)')
+        if not ok:
+            return
+        if len(friendcode) == 0:
+            settings['friendcode'] = ''
+            writeSettings()
+            client.friendcode = ''
+            return
+
+        friendcode = friendcode.replace('-', '').replace(' ', '')
+        try:
+            if len(friendcode) != 12:
+                raise Exception()
+            friendcode = int(friendcode)
+            friendcode = 'SW-' + '-'.join([str(friendcode)[i:i+4] for i in range(0, 12, 4)])
+        except:
+            dlg = QMessageBox()
+            dlg.setWindowTitle('NSO-RPC')
+            dlg.setText('This doesn\'t appear to be a valid friend code. Please retry.')
+            dlg.exec_()
+            return
+
+        settings['friendcode'] = friendcode
+        writeSettings()
+        client.friendcode = friendcode
+
     def selfService(self):
         self.mode = 1
         self.setMode(settings['dark'])
@@ -370,6 +407,8 @@ class GUI(Ui_MainWindow):
         self.logout.clicked.connect(client.logout)
         self.logout.setCursor(QCursor(Qt.PointingHandCursor))
 
+        self.friendCodeButton.clicked.connect(self.setFriendCode)
+
         self.presenceImage = self.stackedWidget.findChild(QLabel, 'label_8')
         self.presenceImage.setScaledContents(True)
         self.label_11.setScaledContents(True)
@@ -392,6 +431,8 @@ class GUI(Ui_MainWindow):
         self.startInSystemTray.setGeometry(QRect(101, 120, 60, 41))
         self.startOnLaunch = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.startOnLaunch.setGeometry(QRect(101, 160, 60, 41))
+        self.toggleSmallPFP = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleSmallPFP.setGeometry(QRect(101, 440, 60, 41))
 
         self.fakePushButton = QPushButton()
         self.fakePushButton.clicked.connect(lambda a: self.label_22.setText(altLink))
@@ -481,6 +522,8 @@ class GUI(Ui_MainWindow):
         self.startInSystemTray.toggled.connect(self.setVisibility)
         self.startOnLaunch.setChecked(settings.get('startOnLaunch', False))
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
+        self.toggleSmallPFP.setChecked(settings['smallImagePFP'])
+        self.toggleSmallPFP.toggled.connect(self.setSmallPFP)
 
         # Check Discord Errors
         self.checkDiscordError()
@@ -770,6 +813,8 @@ if __name__ == '__main__':
         readSettings()
     else:
         writeSettings()
+    client.smallImagePFP = settings['smallImagePFP']
+    client.friendcode = settings['friendcode']
 
     window = GUI(MainWindow)
 
