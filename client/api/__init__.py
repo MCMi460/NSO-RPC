@@ -13,6 +13,7 @@ import hashlib
 import re
 import pickle
 
+
 def getAppPath():
     # Check for macOS platform and NSO-RPC freeze status
     if sys.platform.startswith('darwin') and hasattr(sys, 'frozen') and sys.frozen == 'macosx_app':
@@ -44,6 +45,7 @@ def getAppPath():
     portable_data_path = os.path.join(os.getcwd(), 'NSO-RPC_Data')
     return portable_data_path if os.path.isdir(portable_data_path) else application_path
 
+
 def log(info, time = time.time()):
     path = getAppPath()
     if not os.path.isdir(path):
@@ -58,16 +60,16 @@ def getVersion():
         try:
             r = requests.get('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557', timeout = 10)
             break
-        except:
-            log('Failed to get Apple\'s store page. Retrying...')
-    searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
-    version = searchPattern.findall(r.text)
-    if not version:
-        return ''
-    pattern = re.compile(r'(\d.\d.\d)')
-    if not re.search(pattern, version[0]):
-        return ''
-    return version[0]
+        except requests.RequestException as e:
+            log(f'Failed to get Apple\'s store page. Retrying... Error: {str(e)}')
+    else:
+        log('Failed to get Apple\'s store page after multiple retries.')
+    if r:
+        searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
+        version = searchPattern.search(r.text)
+        if version:
+            return version.group(1)
+    return ''
 
 
 client_id = '71b963c1b7b6d119'
