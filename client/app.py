@@ -174,6 +174,7 @@ try:
 except:
     versionTag = ['', '']
 
+
 def writeSettings():
     try:
         os.mkdir(os.path.dirname(settingsFile))
@@ -189,6 +190,7 @@ def readSettings():
         all = json.loads(file.read())
     for key in all.keys():
         settings[key] = all.get(key)
+
 
 friendTime = time.time()
 iconsStorage = {}
@@ -326,7 +328,7 @@ class GUI(Ui_MainWindow):
             if len(friendcode) != 12:
                 raise Exception()
             friendcode = int(friendcode)
-            friendcode = 'SW-' + '-'.join([str(friendcode)[i:i+4] for i in range(0, 12, 4)])
+            friendcode = 'SW-' + '-'.join([str(friendcode)[i:i + 4] for i in range(0, 12, 4)])
         except:
             dlg = QMessageBox()
             dlg.setWindowTitle('NSO-RPC')
@@ -815,6 +817,11 @@ if __name__ == '__main__':
         writeSettings()
     client.smallImagePFP = settings['smallImagePFP']
     client.friendcode = settings['friendcode']
+
+    # Override version if overrideVersion is set in settings
+    if settings.get('overrideVersion') is not None:
+        print(log("Version override Detected: Replacing target version {} with {}".format(version, settings['overrideVersion'])))
+        version = settings['overrideVersion']
 
     window = GUI(MainWindow)
 
