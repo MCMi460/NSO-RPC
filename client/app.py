@@ -651,8 +651,9 @@ class GUI(Ui_MainWindow):
             }))
         dlg = QMessageBox()
         dlg.setWindowTitle('NSO-RPC')
-        dlg.setText('You will need to restart the application in order for the changes to take place.\nSorry for the inconvenience.')
-        sys.exit(dlg.exec_())
+
+        # Restart NSO-RPC to apply changes
+        Restart_NSORPC()
 
     def setFriendIcons(self, layout):
         global client, iconsStorage

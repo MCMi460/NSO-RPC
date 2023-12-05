@@ -46,6 +46,11 @@ def getAppPath():
     return portable_data_path if os.path.isdir(portable_data_path) else application_path
 
 
+def Restart_NSORPC():
+    args = [sys.executable] + sys.argv
+    os.execl(sys.executable, *args)
+
+
 def log(info, time = time.time()):
     path = getAppPath()
     if not os.path.isdir(path):
