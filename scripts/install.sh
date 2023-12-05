@@ -219,6 +219,7 @@ mkdir -p "$iconDir"
 
 sudo cp './icon.svg' "$iconDir/nso.svg"
 
+# Determine the Python executable
 PYTHON_EXECUTABLE="/opt/NSO-RPC/venv/bin/python"
 if [ "$NO_VENV" = true ]; then
     PYTHON_EXECUTABLE="python3"
@@ -230,7 +231,7 @@ Type=Application
 Name=Nintendo Switch Online Rich Presence
 GenericName=NSO-RPC
 Comment=Display your Nintendo Switch game status on Discord!
-Exec=/bin/sh -c '. /opt/NSO-RPC/venv/bin/activate && cd /opt/NSO-RPC && exec $PYTHON_EXECUTABLE app.py'
+Exec=/bin/sh -c 'cd /opt/NSO-RPC && exec $PYTHON_EXECUTABLE /opt/NSO-RPC/app.py'
 Icon=nso.svg
 Terminal=false
 Categories=Game;Application;Utility;
