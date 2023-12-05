@@ -70,8 +70,6 @@ cd './NSO-RPC/scripts'
 chmod +x './install.sh'
 
 # Pass the use_venv flag to the install.sh script
-
-
 if [ "$no_venv" = true ]; then
   ./install.sh --no-venv
 else
