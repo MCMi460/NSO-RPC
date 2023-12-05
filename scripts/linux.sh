@@ -5,9 +5,8 @@
 # Github: https://github.com/MCMi460/NSO-RPC
 #
 
-YELLOW="\e[33m"
-RESET="\e[0m"
-
+YELLOW_COLOR="\e[33m"
+RESET_COLOR="\e[0m"
 
 # Function to check if a command is available
 command_exists() {
@@ -17,10 +16,37 @@ command_exists() {
 package_managers=("apt-get" "dnf" "pacman")
 package_manager_found=false
 
+# Parse command-line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -r|--repo)
+      github_repo="$2"
+      shift 2
+      ;;
+    -b|--branch)
+      branch="$2"
+      shift 2
+      ;;
+    -n|--no-venv)
+      no_venv=false
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Available options: -r/--repo, -b/--branch, -n/--no-venv"
+      exit 1
+      ;;
+  esac
+done
+
+# Default values if not provided
+github_repo="${github_repo:-MCMi460}"
+branch="${branch:-main}"
+
 # Iterate over package managers
 for manager in "${package_managers[@]}"; do
   if command_exists "$manager"; then
-    echo -e "${YELLOW}[NSO-RPC: Bootstrap] Using $manager package manager.${RESET}"
+    echo -e "${YELLOW_COLOR}[NSO-RPC: Bootstrap] Using $manager package manager.${RESET_COLOR}"
     if [ "$manager" = "pacman" ]; then
       sudo "$manager" -S --noconfirm git
     else
@@ -36,12 +62,18 @@ if ! "$package_manager_found"; then
   exit 1
 fi
 
-branch=${1:-main}
-
 if [ ! -d './NSO-RPC' ]; then
-    git clone --branch "$branch" 'https://github.com/MCMi460/NSO-RPC'
+    git clone --branch "$branch" "https://github.com/$github_repo/NSO-RPC"
 fi
 
 cd './NSO-RPC/scripts'
 chmod +x './install.sh'
-./install.sh
+
+# Pass the use_venv flag to the install.sh script
+
+
+if [ "$no_venv" = true ]; then
+  ./install.sh --no-venv
+else
+  ./install.sh
+fi
