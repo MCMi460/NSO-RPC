@@ -26,6 +26,7 @@ class Discord():
         self.start = int(time.time())
 
         self.smallImagePFP = False
+        self.eShopButton = True
         self.friendcode = ''
 
     def createCTX(self, session_token, user_lang, targetID = None, version = None):
@@ -113,14 +114,18 @@ class Discord():
                         'large_text': presence.game.name,
                         'state': state,
                         'start': self.start,
-                        'buttons': [
-                            {'label': 'Nintendo eShop', 'url': presence.game.shopUri},
-                        ],
                     }
                     if self.smallImagePFP:
                         kwargs['small_image'] = self.user.imageUri
                         if self.friendcode:
                             kwargs['small_text'] = self.user.name + ': ' + self.friendcode
+                    if self.eShopButton:
+                        kwargs['buttons'] = [
+                            {
+                                'label': 'Nintendo eShop',
+                                'url': presence.game.shopUri,
+                            },
+                        ]
                     self.rpc.update(**kwargs)
                 except pypresence.exceptions.PipeClosed:
                     print(log("Discord pipe is closed, Attempting to reconnect."))

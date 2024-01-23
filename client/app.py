@@ -159,6 +159,7 @@ settings = {
     'startInSystemTray': False,
     'startOnLaunch': False,
     'smallImagePFP': True,
+    'eShopButton': True,
     'friendcode': '',
 }
 userSelected = ''
@@ -311,6 +312,12 @@ class GUI(Ui_MainWindow):
         settings['smallImagePFP'] = mode
         writeSettings()
         client.smallImagePFP = mode
+    
+    def setEShopButton(self, mode):
+        global settings
+        settings['eShopButton'] = mode
+        writeSettings()
+        client.eShopButton = mode
 
     def setFriendCode(self):
         global settings
@@ -435,6 +442,8 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.setGeometry(QRect(101, 160, 60, 41))
         self.toggleSmallPFP = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.toggleSmallPFP.setGeometry(QRect(101, 440, 60, 41))
+        self.toggleEShopButton = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.toggleEShopButton.setGeometry(QRect(101, 390, 60, 41))
 
         self.fakePushButton = QPushButton()
         self.fakePushButton.clicked.connect(lambda a: self.label_22.setText(altLink))
@@ -526,6 +535,8 @@ class GUI(Ui_MainWindow):
         self.startOnLaunch.toggled.connect(self.setLaunchMode)
         self.toggleSmallPFP.setChecked(settings['smallImagePFP'])
         self.toggleSmallPFP.toggled.connect(self.setSmallPFP)
+        self.toggleEShopButton.setChecked(settings['eShopButton'])
+        self.toggleEShopButton.toggled.connect(self.setEShopButton)
 
         # Check Discord Errors
         self.checkDiscordError()
@@ -818,6 +829,7 @@ if __name__ == '__main__':
         writeSettings()
     client.smallImagePFP = settings['smallImagePFP']
     client.friendcode = settings['friendcode']
+    client.eShopButton = settings['eShopButton']
 
     # Override version if overrideVersion is set in settings
     if settings.get('overrideVersion') is not None:
