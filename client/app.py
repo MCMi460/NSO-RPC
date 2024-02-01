@@ -660,8 +660,6 @@ class GUI(Ui_MainWindow):
                 'user_lang': client.api.user_lang,
                 'targetID': client.api.targetID,
             }))
-        dlg = QMessageBox()
-        dlg.setWindowTitle('NSO-RPC')
 
         # Restart NSO-RPC to apply changes
         Restart_NSORPC()

@@ -162,7 +162,7 @@ class Discord():
                 os.remove(os.path.join(applicationPath, 'settings.txt'))
             except:
                 pass
-            sys.exit()
+            Restart_NSORPC()
 
 
 def getToken(manual = True, path: str = os.path.join(applicationPath, 'private.txt')):
