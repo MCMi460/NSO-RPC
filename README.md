@@ -59,7 +59,10 @@ Once ran, the app will ask for you to log into your Nintendo account on a web br
 </details></li></ul>
 
 ***Q: Do I need Discord open on my PC to use this application?***  
-**A:** No. Discord only needs to be open for the rich presence to be active.
+**A:** Yes. You need the desktop application open in order for the app to update your Discord status.
+
+***Q: Can I use the Discord website/run this on a Chromebook?***
+**A:** No. The website does not have a method of updating your Rich Presence from games on your computer, so NSO-RPC will not work with it.
 
 ***Q: I can't get the program to run, what's wrong with it?!***  
 **A:** Delete the NSO-RPC folder in your Documents folder. If that doesn't work, you should run the [cli.py][cli] program and get the error data, then make an [issue](https://github.com/MCMi460/NSO-RPC/issues) on Github and I'll investigate it.
