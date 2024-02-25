@@ -22,9 +22,6 @@
      <height>601</height>
     </rect>
    </property>
-   <property name="currentIndex">
-    <number>1</number>
-   </property>
    <widget class="QWidget" name="link">
     <widget class="QLabel" name="label">
      <property name="geometry">
