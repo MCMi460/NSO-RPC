@@ -22,6 +22,9 @@
      <height>601</height>
     </rect>
    </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
    <widget class="QWidget" name="link">
     <widget class="QLabel" name="label">
      <property name="geometry">
@@ -239,7 +242,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>121</y>
+        <y>122</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -265,7 +268,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>161</y>
+        <y>162</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -291,7 +294,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>560</y>
+        <y>558</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -317,7 +320,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>520</y>
+        <y>518</y>
         <width>211</width>
         <height>41</height>
        </rect>
@@ -355,7 +358,7 @@
         <rect>
          <x>20</x>
          <y>150</y>
-         <width>351</width>
+         <width>350</width>
          <height>121</height>
         </rect>
        </property>
@@ -366,13 +369,16 @@
         <property name="geometry">
          <rect>
           <x>120</x>
-          <y>15</y>
+          <y>20</y>
           <width>221</width>
           <height>31</height>
          </rect>
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -413,19 +419,22 @@
         <rect>
          <x>110</x>
          <y>120</y>
-         <width>171</width>
+         <width>170</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
         <string>Currently Playing</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
       <widget class="QLabel" name="label_11">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>10</y>
+         <x>35</x>
+         <y>12</y>
          <width>91</width>
          <height>91</height>
         </rect>
@@ -446,6 +455,9 @@
        <property name="text">
         <string/>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </property>
       </widget>
       <widget class="QLabel" name="label_14">
        <property name="geometry">
@@ -463,9 +475,9 @@
       <widget class="QPushButton" name="pushButton_7">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>78</x>
          <y>550</y>
-         <width>111</width>
+         <width>112</width>
          <height>41</height>
         </rect>
        </property>
@@ -478,7 +490,7 @@
         <rect>
          <x>200</x>
          <y>550</y>
-         <width>111</width>
+         <width>112</width>
          <height>41</height>
         </rect>
        </property>
@@ -492,9 +504,9 @@
        </property>
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>280</y>
-         <width>341</width>
+         <width>351</width>
          <height>80</height>
         </rect>
        </property>
