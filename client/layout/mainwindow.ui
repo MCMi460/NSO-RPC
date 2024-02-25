@@ -46,9 +46,9 @@
      <property name="geometry">
       <rect>
        <x>40</x>
-       <y>190</y>
-       <width>511</width>
-       <height>211</height>
+       <y>180</y>
+       <width>521</width>
+       <height>221</height>
       </rect>
      </property>
      <property name="title">
@@ -57,8 +57,8 @@
      <widget class="QPushButton" name="pushButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>140</y>
+        <x>170</x>
+        <y>143</y>
         <width>181</width>
         <height>31</height>
        </rect>
@@ -70,8 +70,8 @@
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>70</y>
+        <x>90</x>
+        <y>50</y>
         <width>341</width>
         <height>24</height>
        </rect>
@@ -83,9 +83,9 @@
      <widget class="QComboBox" name="comboBox">
       <property name="geometry">
        <rect>
-        <x>216</x>
-        <y>100</y>
-        <width>79</width>
+        <x>230</x>
+        <y>80</y>
+        <width>61</width>
         <height>24</height>
        </rect>
       </property>
@@ -116,14 +116,13 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>420</y>
+       <y>430</y>
        <width>331</width>
-       <height>71</height>
+       <height>61</height>
       </rect>
      </property>
      <property name="text">
-      <string>
-If you'd like to use this app for Discord Rich Presence purposes, please link an account that is friended with the target account.</string>
+      <string>If you'd like to use this app for Discord Rich Presence purposes, please link an account that is friended with the target account.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -174,7 +173,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
         <x>0</x>
         <y>0</y>
         <width>211</width>
-        <height>121</height>
+        <height>122</height>
        </rect>
       </property>
       <property name="title">
@@ -210,13 +209,16 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>20</y>
+         <y>28</y>
          <width>71</width>
-         <height>61</height>
+         <height>51</height>
         </rect>
        </property>
        <property name="text">
         <string>NSO-RPC</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
        </property>
       </widget>
       <widget class="QLabel" name="label_6">
@@ -248,10 +250,10 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
       <widget class="QPushButton" name="pushButton_2">
        <property name="geometry">
         <rect>
-         <x>-1</x>
-         <y>3</y>
+         <x>0</x>
+         <y>0</y>
          <width>211</width>
-         <height>41</height>
+         <height>40</height>
         </rect>
        </property>
        <property name="text">
@@ -277,7 +279,7 @@ If you'd like to use this app for Discord Rich Presence purposes, please link an
          <x>0</x>
          <y>0</y>
          <width>211</width>
-         <height>41</height>
+         <height>40</height>
         </rect>
        </property>
        <property name="text">
