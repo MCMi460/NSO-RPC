@@ -76,7 +76,7 @@ class Ui_MainWindow(object):
         self.label_4.setText("")
         self.label_4.setObjectName("label_4")
         self.label_5 = QtWidgets.QLabel(self.groupBox_2)
-        self.label_5.setGeometry(QtCore.QRect(130, 28, 71, 51))
+        self.label_5.setGeometry(QtCore.QRect(130, 26, 71, 51))
         self.label_5.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.label_5.setObjectName("label_5")
         self.label_6 = QtWidgets.QLabel(self.groupBox_2)
@@ -222,7 +222,6 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.home)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
