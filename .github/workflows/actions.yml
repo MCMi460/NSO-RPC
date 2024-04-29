@@ -14,8 +14,8 @@ jobs:
           - 'pyqt6'
           - 'pyqt5'
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: 3.11.4
     - name: "Build"
@@ -27,7 +27,7 @@ jobs:
       if: matrix.pyqt_version == 'pyqt5'
       run: mv client/dist/NSO-RPC.exe client/dist/NSO-RPC-qt5.exe
     - name: "Upload Build"
-      uses: softprops/action-gh-release@v0.1.15
+      uses: softprops/action-gh-release@v2.0.4
       with:
         files: |
           client/dist/NSO-RPC*.exe
@@ -36,8 +36,8 @@ jobs:
     name: 'Build NSO-RPC - Linux'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: 3.11.4
     - name: "Upload script"
@@ -46,7 +46,7 @@ jobs:
         chmod +x linux.sh
       continue-on-error: false
     - name: "Upload Build"
-      uses: softprops/action-gh-release@v0.1.15
+      uses: softprops/action-gh-release@v2.0.4
       with:
         files: scripts/linux.sh
 
@@ -54,8 +54,8 @@ jobs:
     name: 'Build NSO-RPC - MacOS'
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: 3.11.4
     - name: "Build"
@@ -68,7 +68,7 @@ jobs:
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
         zip -yr mac-portable.zip NSO-RPC.app/
     - name: "Upload Build"
-      uses: softprops/action-gh-release@v0.1.15
+      uses: softprops/action-gh-release@v2.0.4
       with:
         files: |
           client/dist/mac-installer.dmg
@@ -78,8 +78,8 @@ jobs:
     name: 'Build NSO-RPC - Universal2'
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
         python-version: 3.11.4
     - name: "Install Python 3.11.4 and build NSO-RPC"
@@ -94,7 +94,7 @@ jobs:
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
         zip -yr mac-universal2-portable.zip NSO-RPC.app/
     - name: "Upload NSO-RPC Universal2 Build"
-      uses: softprops/action-gh-release@v0.1.15
+      uses: softprops/action-gh-release@v2.0.4
       with:
         files: |
           client/dist/mac-universal2-installer.dmg
@@ -111,6 +111,6 @@ jobs:
         hash-type: sha256
         file-name: checksums.txt
         get-assets: true
-    - uses: softprops/action-gh-release@v0.1.15
+    - uses: softprops/action-gh-release@v2.0.4
       with:
         files: checksums.txt
