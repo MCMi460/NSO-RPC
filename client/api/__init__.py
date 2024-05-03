@@ -283,10 +283,20 @@ class Login():
         self.na_id = userInfo['id']
 
         self.imink = imink(self.na_id, self.accessToken, self.timestamp, self.guid, 1).get()
-        self.timestamp = int(self.imink['timestamp'])
-        self.guid = self.imink['request_id']
 
-        self.account = None
+        if 'error' in self.imink or self.imink.get('error') is not None:
+            iminkApiError = (
+                'Unable to authenticate with imink. \n\n'
+                'The F Calculation API may be experiencing issues. \n'
+                'Please check the website for more details: \n'
+                'https://status.imink.app/ \n'
+            )
+            raise RuntimeError(iminkApiError) from None
+        else:
+            self.timestamp = int(self.imink['timestamp'])
+            self.guid = self.imink['request_id']
+
+            self.account = None
 
     def loginToAccount(self):
         route = '/v3/Account/Login'
