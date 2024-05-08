@@ -14,6 +14,33 @@ import re
 import pickle
 
 
+def getVersionRegex(html: str):
+    try:
+        # Attempt to determine the appropriate regex pattern with prefix
+        version_with_prefix = re.compile(r'Version\s*\s*(\d+\.\d+\.\d+)').search(html)
+        if version_with_prefix:
+            return version_with_prefix
+    except Exception as e:
+        print(f"Failed to determine regex pattern with prefix: {e}")
+
+    try:
+        # Attempt to determine an alternative regex pattern with prefix
+        version_without_space = re.compile(r'Version\s*(\d+\.\d+\.\d+)').search(html)
+        if version_without_space:
+            return version_without_space
+    except Exception as e:
+        print(f"Failed to determine alternative regex pattern with prefix: {e}")
+
+    try:
+        # Attempt to determine an alternative regex pattern without prefix
+        version_no_prefix = re.compile(r'(\d+\.\d+\.\d+)').search(html)
+        if version_no_prefix:
+            return version_no_prefix
+    except Exception as e:
+        print(f"Failed to determine regex pattern without prefix: {e}")
+    return None
+
+
 def getAppPath():
     # Check for macOS platform and NSO-RPC freeze status
     if sys.platform.startswith('darwin') and hasattr(sys, 'frozen') and sys.frozen == 'macosx_app':
@@ -70,10 +97,10 @@ def getVersion():
     else:
         log('Failed to get Apple\'s store page after multiple retries.')
     if r:
-        searchPattern = re.compile(r'Version\s*(\d\.\d\.\d)+')
-        version = searchPattern.search(r.text)
+        version = getVersionRegex(r.text)
         if version:
-            return version.group(1)
+            app_version = version.group(1)
+            return app_version
     return ''
 
 
@@ -97,11 +124,11 @@ languages = [  # ISO Language codes
 
 class API():
     def __init__(self, session_token, user_lang, targetID, version):
-        pattern = re.compile(r'(\d.\d.\d)')
-        if not version or not re.search(pattern, version):
+        version_match = getVersionRegex(version)
+        if not version_match:
             raise Exception('missing app version')
         global nsoAppVersion
-        nsoAppVersion = version
+        nsoAppVersion = version_match.group(1)
         self.headers = {
             'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
