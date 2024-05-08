@@ -1,4 +1,6 @@
 #!/bin/bash
+python3 -m venv --upgrade-deps venv
+source venv/bin/activate
 python3 -m pip install wheel PyQt6
 bash prep-PyQt.sh
 cd ../../client
