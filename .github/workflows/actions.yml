@@ -64,6 +64,7 @@ jobs:
         python -m pip install pyqt6 &&
         ./build.sh &&
         cd ../client/dist &&
+        bash ../../scripts/tests/macos_test.sh &&
         ln -s /Applications "Applications (admin)" &&
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
         zip -yr mac-portable.zip NSO-RPC.app/
@@ -90,6 +91,7 @@ jobs:
         cd scripts/macos-universal2 &&
         bash ./build.sh &&
         cd ../../client/dist &&
+        bash ../../scripts/tests/macos_test.sh &&
         ln -s /Applications "Applications (admin)" &&
         hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
         zip -yr mac-universal2-portable.zip NSO-RPC.app/
