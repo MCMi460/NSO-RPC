@@ -20,6 +20,7 @@ jobs:
           - pyqt5
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
@@ -90,10 +91,9 @@ jobs:
           python-version: 3.11.4
       - name: Install Python 3.11.4 and build NSO-RPC
         run: >
-          curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o
-          python-3.11.4-macos11.pkg
+          curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o python-3.11.4-macos11.pkg &&
           sudo installer -verbose -pkg python-3.11.4-macos11.pkg -target / &&
-          alias python3=python3.11
+          alias python3=python3.11 &&
           cd scripts/macos-universal2 &&
           bash ./build.sh &&
           cd ../../client/dist &&
