@@ -2,7 +2,7 @@
 python3 -m venv --upgrade-deps venv
 source venv/bin/activate
 cd ../client
-python3 -m pip install -r requirements.txt py2app GitPython
+python3 -m pip install -r requirements.txt pyqt6 py2app GitPython
 python3 _version.py
 rm setup.py
 py2applet --make-setup app.py icon.icns "icon.png" "taskbarDark.png" "taskbarLight.png" "version.txt"

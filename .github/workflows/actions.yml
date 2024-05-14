@@ -61,7 +61,6 @@ jobs:
     - name: "Build"
       run: |
         cd scripts &&
-        python -m pip install pyqt6 &&
         ./build.sh &&
         cd ../client/dist &&
         bash ../../scripts/tests/macos_test.sh &&
