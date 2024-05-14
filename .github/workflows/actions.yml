@@ -1,119 +1,125 @@
-name: 'Build NSO-RPC - x86_64'
+---
+name: Build NSO-RPC - x86_64
 on:
   release:
-    types: [published]
+    types:
+      - published
   pull_request:
-    types: [opened, synchronize]
-
+    types:
+      - opened
+      - synchronize
 jobs:
   build-windows:
-    name: 'Build NSO-RPC - Windows'
+    name: Build NSO-RPC - Windows
     runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
         pyqt_version:
-          - 'pyqt6'
-          - 'pyqt5'
+          - pyqt6
+          - pyqt5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
-      - name: "Build"
+      - name: Build
         run: |
           python -m pip install ${{ matrix.pyqt_version }} &&
           cd scripts &&
           ./build.bat
-      - name: "Rename executable"
+      - name: Rename executable
         if: matrix.pyqt_version == 'pyqt5'
         run: mv client/dist/NSO-RPC.exe client/dist/NSO-RPC-qt5.exe
-      - name: "Upload Build"
+      - name: Upload Build
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2.0.4
         with:
           files: |
             client/dist/NSO-RPC*.exe
-
   build-linux:
-    name: 'Build NSO-RPC - Linux'
+    name: Build NSO-RPC - Linux
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
-      - name: "Upload script"
+      - name: Upload script
         run: |
           cd scripts &&
           chmod +x linux.sh
         continue-on-error: false
-      - name: "Upload Build"
+      - name: Upload Build
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2.0.4
         with:
           files: scripts/linux.sh
-
   build-macos:
-    name: 'Build NSO-RPC - MacOS'
+    name: Build NSO-RPC - MacOS
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
-      - name: "Build"
-        run: |
+      - name: Build
+        run: >
           cd scripts &&
           ./build.sh &&
           cd ../client/dist &&
           bash ../../scripts/tests/macos_test.sh &&
+          rm output.log &&
           ln -s /Applications "Applications (admin)" &&
           hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
           zip -yr mac-portable.zip NSO-RPC.app/
-      - name: "Upload Build"
+      - name: Upload Build
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2.0.4
         with:
           files: |
             client/dist/mac-installer.dmg
             client/dist/mac-portable.zip
-
   build-universal2:
-    name: 'Build NSO-RPC - Universal2'
+    name: Build NSO-RPC - Universal2
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
-      - name: "Install Python 3.11.4 and build NSO-RPC"
-        run: |
-          curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o python-3.11.4-macos11.pkg
+      - name: Install Python 3.11.4 and build NSO-RPC
+        run: >
+          curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o
+          python-3.11.4-macos11.pkg
           sudo installer -verbose -pkg python-3.11.4-macos11.pkg -target / &&
           alias python3=python3.11
           cd scripts/macos-universal2 &&
           bash ./build.sh &&
           cd ../../client/dist &&
           bash ../../scripts/tests/macos_test.sh &&
+          rm output.log &&
           ln -s /Applications "Applications (admin)" &&
           hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
           zip -yr mac-universal2-portable.zip NSO-RPC.app/
-      - name: "Upload NSO-RPC Universal2 Build"
+      - name: Upload NSO-RPC Universal2 Build
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2.0.4
         with:
           files: |
             client/dist/mac-universal2-installer.dmg
             client/dist/mac-universal2-portable.zip
-
   get-hashes:
-    name: 'Generate Checksums'
+    name: Generate Checksums
     runs-on: ubuntu-22.04
-    needs: [build-windows, build-linux, build-macos, build-universal2]
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos
+      - build-universal2
     if: github.event_name != 'pull_request'
     steps:
-      - name: "Generate checksums.txt"
+      - name: Generate checksums.txt
         uses: MCJack123/ghaction-generate-release-hashes@v4
         with:
           hash-type: sha256
