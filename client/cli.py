@@ -28,6 +28,7 @@ class Discord():
         self.smallImagePFP = False
         self.eShopButton = True
         self.friendcode = ''
+        self.hideTotalPlaytime = False
 
     def createCTX(self, session_token, user_lang, targetID = None, version = None):
         try:
@@ -112,9 +113,10 @@ class Discord():
                         'details': presence.game.name,
                         'large_image': presence.game.imageUri,
                         'large_text': presence.game.name,
-                        'state': state,
                         'start': self.start,
                     }
+                    if not self.hideTotalPlaytime:
+                        kwargs['state'] = state
                     if self.smallImagePFP:
                         kwargs['small_image'] = self.user.imageUri
                         if self.friendcode:
