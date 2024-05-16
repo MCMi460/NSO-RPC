@@ -1,11 +1,14 @@
 #!/bin/bash
+set -e
+cd "$(dirname "$0")"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
 # Start the application in the background
-./NSO-RPC.app/Contents/MacOS/NSO-RPC > output.log 2>&1 &
+../../client/dist/NSO-RPC.app/Contents/MacOS/NSO-RPC > output.log 2>&1 &
 APP_PID=$!
 
 sleep 10
