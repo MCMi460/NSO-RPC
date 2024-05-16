@@ -1,7 +1,15 @@
 #!/bin/bash
+set -e
+
+# Run everything relative to our script directory.
+cd "$(dirname "$0")"
+
+# Activate a virtual environment so we don't pollute the system environment.
 python3 -m venv --upgrade-deps venv
 source venv/bin/activate
 cd ../client
+
+# As this is an x86_64 only version, ensure `py2app` outputs x86_64.
 python3 -m pip install -r requirements.txt pyqt6 py2app GitPython
 python3 _version.py
 rm setup.py

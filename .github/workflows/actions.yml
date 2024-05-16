@@ -64,12 +64,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
+      # We initially use `arch -x86_64` to ensure that we use an x86_64 version
+      # of Python, regardless of the host architecture.
+      # Subsequent invocations will all use the x86_64 `python3` binary within the venv.
       - name: Build
         run: >
           cd scripts &&
-          ./build.sh &&
+          arch -x86_64 /bin/bash ./build.sh &&
           cd ../client/dist &&
-          bash ../../scripts/tests/macos_test.sh &&
+          arch -x86_64 /bin/bash ../../scripts/tests/macos_test.sh &&
           rm output.log &&
           ln -s /Applications "Applications (admin)" &&
           hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
