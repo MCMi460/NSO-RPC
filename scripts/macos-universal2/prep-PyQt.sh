@@ -4,6 +4,14 @@ set -e
 # Provided by @spotlightishere on Github
 # https://github.com/MCMi460/NSO-RPC/pull/86#issuecomment-1605700512
 
+# Within GitHub Actions and similar, we should use the Python.org
+# copy of Python 3.11 available. This permits a universal2 framework for py2app.
+# (Otherwise, GitHub's default runners include a single architecture version.)
+if [[ "$CI" == "true" ]]; then
+  shopt -s expand_aliases
+  alias python3=/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11
+fi
+
 # If we already have a universal2 wheel available, install and process no further.
 # https://stackoverflow.com/a/6364244
 if compgen -G "./PyQt6_*universal2.whl"; then
