@@ -1,5 +1,5 @@
 requests
-pypresence @ git+https://github.com/qwertyquerty/pypresence/@0ddf2c0483224339aff48467db570dd901d4793a
+pypresence @ git+https://github.com/qwertyquerty/pypresence/@5b4cb5aa039c1561f1490abb333bd1cd1a69aaba
 qtpy
 autopep8
 qtwidgets @ git+https://github.com/MCMi460/python-qtwidgets@e0fdba848725749775aceefc5d29e15865667bf0

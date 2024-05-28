@@ -30,7 +30,7 @@ if "%PYQT_PACKAGE%"=="" (
 echo Building with %PYQT_PACKAGE%
 
 REM Install requirements
-python -m pip install -r ../client/requirements.txt GitPython pypiwin32 winshell pyinstaller>=5.12 pyinstaller-hooks-contrib==2023.4
+python -m pip install -r ../client/requirements.txt GitPython pypiwin32 winshell pyinstaller>=6.6.0 pyinstaller-hooks-contrib==2024.6
 
 REM Generate version.txt
 python _version.py

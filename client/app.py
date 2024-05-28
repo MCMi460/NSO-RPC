@@ -161,6 +161,7 @@ settings = {
     'smallImagePFP': True,
     'eShopButton': True,
     'friendcode': '',
+    'hideTotalPlaytime': False,
 }
 userSelected = ''
 
@@ -312,7 +313,13 @@ class GUI(Ui_MainWindow):
         settings['smallImagePFP'] = mode
         writeSettings()
         client.smallImagePFP = mode
-    
+
+    def setHideTotalPlaytime(self, mode):
+        global settings
+        settings['hideTotalPlaytime'] = mode
+        writeSettings()
+        client.hideTotalPlaytime = mode
+
     def setEShopButton(self, mode):
         global settings
         settings['eShopButton'] = mode
@@ -444,6 +451,8 @@ class GUI(Ui_MainWindow):
         self.toggleSmallPFP.setGeometry(QRect(101, 440, 60, 41))
         self.toggleEShopButton = AnimatedToggle(self.page_3, checked_color = '#09ab44')
         self.toggleEShopButton.setGeometry(QRect(101, 390, 60, 41))
+        self.hideTotalPlaytime = AnimatedToggle(self.page_3, checked_color = '#09ab44')
+        self.hideTotalPlaytime.setGeometry(QRect(101, 340, 60, 41))
 
         self.fakePushButton = QPushButton()
         self.fakePushButton.clicked.connect(lambda a: self.label_22.setText(altLink))
@@ -537,6 +546,8 @@ class GUI(Ui_MainWindow):
         self.toggleSmallPFP.toggled.connect(self.setSmallPFP)
         self.toggleEShopButton.setChecked(settings['eShopButton'])
         self.toggleEShopButton.toggled.connect(self.setEShopButton)
+        self.hideTotalPlaytime.setChecked(settings.get('hideTotalPlaytime', False))
+        self.hideTotalPlaytime.toggled.connect(self.setHideTotalPlaytime)
 
         # Check Discord Errors
         self.checkDiscordError()
