@@ -254,7 +254,7 @@ class UsersMe():
 class imink():
     def __init__(self, na_id, id_token, timestamp, guid, iteration):
         self.headers = {
-            'User-Agent': 'NSO-RPC/%s' % version,
+            'User-Agent': 'NSO-RPC/%s' % "-".join(versionTag),
             'Content-Type': 'application/json; charset=utf-8',
         }
         self.body = {
