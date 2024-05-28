@@ -20,13 +20,7 @@ MainWindow = QMainWindow()
 
 # NSO Variables
 session_token, user_lang, targetID = getToken(False)
-version = getVersion()
-while not version:
-    version, ok = QInputDialog.getText(MainWindow, 'Version Number', 'What is the current version of the Nintendo Switch Online Mobile app?\nThe App Store says it is %s (Please enter like X.X.X)\nEnter nothing and press Okay to be sent to the app store\'s website.' % version)
-    if not ok:
-        quit()
-    if ok and not version:
-        webbrowser.open('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557')
+version = getIminkNSOVersion()
 try:
     client = Discord(session_token, user_lang, False, targetID, version)
 except Exception as e:
@@ -109,15 +103,6 @@ darkMode = style.replace('#F2F2F2', '#2b2828').replace('#dfdfdf', '#383333').rep
 # self.mode = 2 is for full
 
 
-def getPath(path):
-    try:
-        root = sys._MEIPASS
-    except Exception:
-        root = os.path.abspath('.')
-
-    return os.path.join(root, path)
-
-
 def loadPix(url):
     _pixmap = QPixmap()
     _pixmap.loadFromData(requests.get(url).content)
@@ -164,17 +149,6 @@ settings = {
     'hideTotalPlaytime': False,
 }
 userSelected = ''
-
-# Get Version Info
-try:
-    with open(getPath('version.txt'), 'r') as file:
-        versionTag = file.read().rstrip()
-        try:
-            versionTag = versionTag.split('-', 1)
-        except ValueError:
-            versionTag = [versionTag, '']
-except:
-    versionTag = ['', '']
 
 
 def writeSettings():

@@ -13,32 +13,39 @@ import hashlib
 import re
 import pickle
 
+fTokenAPIURL = "https://api.imink.app"
+fTokenVersion = None
 
-def getVersionRegex(html: str):
-    try:
-        # Attempt to determine the appropriate regex pattern with prefix
-        version_with_prefix = re.compile(r'Version\s*\s*(\d+\.\d+\.\d+)').search(html)
-        if version_with_prefix:
-            return version_with_prefix
-    except Exception as e:
-        print(f"Failed to determine regex pattern with prefix: {e}")
 
-    try:
-        # Attempt to determine an alternative regex pattern with prefix
-        version_without_space = re.compile(r'Version\s*(\d+\.\d+\.\d+)').search(html)
-        if version_without_space:
-            return version_without_space
-    except Exception as e:
-        print(f"Failed to determine alternative regex pattern with prefix: {e}")
+def getIminkNSOVersion():
+    global fTokenVersion
+    if fTokenVersion == None:
+        route = '/config'
+        response = requests.get(fTokenAPIURL + route)
+        fTokenVersion = json.loads(response.text)['nso_version']
+        return fTokenVersion
+    return fTokenVersion
 
+
+def getPath(path):
     try:
-        # Attempt to determine an alternative regex pattern without prefix
-        version_no_prefix = re.compile(r'(\d+\.\d+\.\d+)').search(html)
-        if version_no_prefix:
-            return version_no_prefix
-    except Exception as e:
-        print(f"Failed to determine regex pattern without prefix: {e}")
-    return None
+        root = sys._MEIPASS
+    except Exception:
+        root = os.path.abspath('.')
+
+    return os.path.join(root, path)
+
+
+# Get Version Info
+try:
+    with open(getPath('version.txt'), 'r') as file:
+        versionTag = file.read().rstrip()
+        try:
+            versionTag = versionTag.split('-', 1)
+        except ValueError:
+            versionTag = [versionTag, '']
+except:
+    versionTag = ['', '']
 
 
 def getAppPath():
@@ -87,23 +94,6 @@ def log(info, time = time.time()):
     return info
 
 
-def getVersion():
-    for i in range(5):
-        try:
-            r = requests.get('https://apps.apple.com/us/app/nintendo-switch-online/id1234806557', timeout = 10)
-            break
-        except requests.RequestException as e:
-            log(f'Failed to get Apple\'s store page. Retrying... Error: {str(e)}')
-    else:
-        log('Failed to get Apple\'s store page after multiple retries.')
-    if r:
-        version = getVersionRegex(r.text)
-        if version:
-            app_version = version.group(1)
-            return app_version
-    return ''
-
-
 client_id = '71b963c1b7b6d119'
 version = 0.3
 nsoAppVersion = None
@@ -124,11 +114,8 @@ languages = [  # ISO Language codes
 
 class API():
     def __init__(self, session_token, user_lang, targetID, version):
-        version_match = getVersionRegex(version)
-        if not version_match:
-            raise Exception('missing app version')
         global nsoAppVersion
-        nsoAppVersion = version_match.group(1)
+        nsoAppVersion = getIminkNSOVersion()
         self.headers = {
             'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
@@ -276,7 +263,7 @@ class imink():
             'na_id': na_id,
         }
 
-        self.url = 'https://api.imink.app'
+        self.url = fTokenAPIURL
 
     def get(self):
         log('Login from imink')
