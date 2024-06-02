@@ -1,12 +1,15 @@
 #!/bin/bash
+set -e
+cd "$(dirname "$0")"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
 # Start the application in the background
-./NSO-RPC.app/Contents/MacOS/NSO-RPC > output.log 2>&1 &
-APP_PID=$!
+open --stdout output.log --stderr output.log ../../client/dist/NSO-RPC.app
+APP_PID=$(pgrep -n NSO-RPC)
 
 sleep 10
 kill $APP_PID
@@ -21,5 +24,9 @@ if echo "$output" | grep -q "Launch error"; then
     exit 1
 else
     echo -e "${GREEN}Test Passed!${NC}"
+    # TODO(spotlightishere): Resolve issues with test invocation
+    if [ -f output.log ]; then
+        rm output.log
+    fi
     exit 0
 fi

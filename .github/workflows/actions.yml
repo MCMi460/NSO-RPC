@@ -20,7 +20,6 @@ jobs:
           - pyqt5
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
@@ -34,7 +33,7 @@ jobs:
         run: mv client/dist/NSO-RPC.exe client/dist/NSO-RPC-qt5.exe
       - name: Upload Build
         if: github.event_name != 'pull_request'
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             client/dist/NSO-RPC*.exe
@@ -53,58 +52,65 @@ jobs:
         continue-on-error: false
       - name: Upload Build
         if: github.event_name != 'pull_request'
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2
         with:
           files: scripts/linux.sh
   build-macos:
     name: Build NSO-RPC - MacOS
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11.4
+          architecture: x64
+      # We initially use `arch -x86_64` to ensure that we use an x86_64 version
+      # of Python, regardless of the host architecture.
+      # Subsequent invocations will all use the x86_64 `python3` binary within the venv.
       - name: Build
         run: >
-          cd scripts &&
-          ./build.sh &&
-          cd ../client/dist &&
-          bash ../../scripts/tests/macos_test.sh &&
-          rm output.log &&
+          arch -x86_64 /bin/bash ./scripts/build.sh
+      - name: Test
+        run: >
+          arch -x86_64 /bin/bash ./scripts/tests/macos_test.sh
+      - name: Create Distributions
+        run: >
+          cd ./client/dist &&
           ln -s /Applications "Applications (admin)" &&
           hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-installer.dmg &&
           zip -yr mac-portable.zip NSO-RPC.app/
       - name: Upload Build
         if: github.event_name != 'pull_request'
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             client/dist/mac-installer.dmg
             client/dist/mac-portable.zip
   build-universal2:
     name: Build NSO-RPC - Universal2
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11.4
-      - name: Install Python 3.11.4 and build NSO-RPC
+      - name: Install Universal Python 3.11.4
         run: >
           curl https://www.python.org/ftp/python/3.11.4/python-3.11.4-macos11.pkg -o python-3.11.4-macos11.pkg &&
-          sudo installer -verbose -pkg python-3.11.4-macos11.pkg -target / &&
+          sudo installer -verbose -pkg python-3.11.4-macos11.pkg -target /
+      - name: Build
+        run: >
           alias python3=python3.11 &&
-          cd scripts/macos-universal2 &&
-          bash ./build.sh &&
-          cd ../../client/dist &&
-          bash ../../scripts/tests/macos_test.sh &&
-          rm output.log &&
+          bash ./scripts/macos-universal2/build.sh
+      - name: Test
+        run: >
+          bash ./scripts/tests/macos_test.sh
+      - name: Create Distributions
+        run: >
+          cd client/dist &&
           ln -s /Applications "Applications (admin)" &&
           hdiutil create -fs HFS+ -srcfolder . -volname NSO-RPC mac-universal2-installer.dmg &&
           zip -yr mac-universal2-portable.zip NSO-RPC.app/
       - name: Upload NSO-RPC Universal2 Build
         if: github.event_name != 'pull_request'
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             client/dist/mac-universal2-installer.dmg
@@ -125,6 +131,6 @@ jobs:
           hash-type: sha256
           file-name: checksums.txt
           get-assets: true
-      - uses: softprops/action-gh-release@v2.0.4
+      - uses: softprops/action-gh-release@v2
         with:
           files: checksums.txt
