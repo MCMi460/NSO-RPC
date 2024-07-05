@@ -121,6 +121,19 @@ if ! is_qt_installed; then
     exit 1
 fi
 
+setup_virtual_environment() {
+    if [ -z "$NO_VENV" ] && [ ! -d "venv" ]; then
+        python3 -m venv venv
+    fi
+
+    if [ -n "$NO_VENV" ]; then
+        python3 -m pip install "$1"
+    else
+        source venv/bin/activate
+        python3 -m pip install "$1"
+    fi
+}
+
 # Function to install Python bindings based on Qt version
 function install_python_bindings {
     if is_qt_installed; then
@@ -133,7 +146,7 @@ function install_python_bindings {
                 elif [ "$PACKAGE_MANAGER" == "pacman" ]; then
                     sudo $PACKAGE_MANAGER -S --noconfirm python-pyqt6
                 fi
-                python3 -m pip install pyqt6
+                setup_virtual_environment pyqt6
             fi
         elif $PACKAGE_MANAGER -Qs '^qt5' >/dev/null 2>&1; then
             if ! is_package_installed python3-pyqt5; then
@@ -144,7 +157,7 @@ function install_python_bindings {
                 elif [ "$PACKAGE_MANAGER" == "pacman" ]; then
                     sudo $PACKAGE_MANAGER -S --noconfirm python-pyqt5
                 fi
-                python3 -m pip install pyqt5
+                setup_virtual_environment pyqt5
             fi
         fi
     fi
