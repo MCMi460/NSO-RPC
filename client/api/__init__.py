@@ -13,6 +13,26 @@ import hashlib
 import re
 import pickle
 
+
+get_orig = requests.get
+post_orig = requests.post
+def get_print(*args, **kwargs):
+    print('GET, REQUEST:')
+    print(args, kwargs)
+    response = get_orig(*args, **kwargs)
+    print('GET, RESPONSE:')
+    print(response.content)
+    return response
+def post_print(*args, **kwargs):
+    print('GET, REQUEST:')
+    print(args, kwargs)
+    response = post_orig(*args, **kwargs)
+    print('GET, RESPONSE:')
+    print(response.content)
+    return response
+requests.get = get_print
+requests.post = post_print
+
 fTokenAPIURL = "https://api.imink.app"
 fTokenVersion = None
 
@@ -119,7 +139,7 @@ class API():
         self.headers = {
             'X-ProductVersion': nsoAppVersion,
             'X-Platform': 'iOS',
-            'User-Agent': 'Coral/%s (com.nintendo.znca; build:1999; iOS 15.5.0) Alamofire/5.4.4' % nsoAppVersion,
+            'User-Agent': 'Coral/%s (com.nintendo.znca; iOS 18.1.1)' % nsoAppVersion,
             'Accept': 'application/json',
             'Content-Type': 'application/json; charset=utf-8',
             'Host': 'api-lp1.znc.srv.nintendo.net',
@@ -377,6 +397,7 @@ class FriendList():
 
     def populateList(self, API: API):
         response = API.makeRequest(self.route)
+        print(response.text)
         try:
             arr = json.loads(response.text)['result']['friends']
         except Exception as e:

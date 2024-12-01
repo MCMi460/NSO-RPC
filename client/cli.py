@@ -87,7 +87,15 @@ class Discord():
                             'user_lang': self.api.user_lang,
                             'targetID': self.api.targetID,
                         }))
-                self.api.getSelf()
+                #self.api.getSelf()
+                self.api.user = User({
+                    'links': {
+                        'friendCode': {},
+                    },
+                    'presence': {
+                        'game': {},
+                    }
+                })
                 break
             except Exception as e:
                 log(e)

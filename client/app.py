@@ -101,6 +101,7 @@ QScrollBar::add-line, QScrollBar::sub-line {
 darkMode = style.replace('#F2F2F2', '#2b2828').replace('#dfdfdf', '#383333').replace('#ffffff', '#e6e6e6').replace('#fff', '#1e2024').replace('#393939', '#c4bebe').replace('#3c3c3c', '#fff')
 # self.mode = 1 is for token
 # self.mode = 2 is for full
+icon_pix = QPixmap(getPath('icon.png'))
 
 
 def loadPix(url):
@@ -481,7 +482,10 @@ class GUI(Ui_MainWindow):
             raise e
 
         # Set user image
-        client.api.user.image = loadPix(client.api.user.imageUri)
+        if client.api.user.imageUri:
+            client.api.user.image = loadPix(client.api.user.imageUri)
+        else:
+            client.api.user.image = icon_pix
         radius = 150
 
         rounded = QPixmap(client.api.user.image.size())
@@ -503,7 +507,7 @@ class GUI(Ui_MainWindow):
         self.updateFriends()
 
         # Set NSwitch Icon
-        self.nSwitchIcon.setPixmap(QPixmap(getPath('icon.png')))
+        self.nSwitchIcon.setPixmap(icon_pix)
 
         # Set toggle state
         self.toggleStatus.setChecked(client.running)
@@ -573,7 +577,10 @@ class GUI(Ui_MainWindow):
 
         if not user.image:
             if not user.nsaId in iconsStorage:
-                user.image = loadPix(user.imageUri)
+                if user.imageUri:
+                    user.image = loadPix(user.imageUri)
+                else:
+                    user.image = icon_pix
                 iconsStorage[user.nsaId] = user.image
             else:
                 user.image = iconsStorage[user.nsaId]
