@@ -300,11 +300,12 @@ class Login():
 
         if 'error' in self.imink or self.imink.get('error') is not None:
             iminkApiError = (
-                'Unable to authenticate with imink. \n\n'
-                'The F Calculation API may be experiencing issues or this build of NSO-RPC is outdated \n'
-                'Please try the most upto date build of NSO-RPC before submitting an issue. \n'
-                'Please check the website for more details: \n'
-                'https://status.imink.app/ \n'
+                'Authentication with imink failed. \n\n'
+                'Please follow these steps to resolve the issue:\n'
+                '1. First, check the "F Calculation API" status on the imink API status page: https://status.imink.app/ \n'
+                '2. If the F Calculation API is operational, ensure you are using the latest version of NSO-RPC.\n'
+                '3. If the issue persists, join the Discord or open a GitHub issue for further assistance.\n'
+                'Thank you for your patience!'
             )
             raise RuntimeError(iminkApiError) from None
         else:
