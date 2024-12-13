@@ -1,5 +1,14 @@
 # Nintendo Switch Online Rich Presence
 
+## ⚠️ Disclaimer
+Nintendo has recently updated Nintendo Switch Online (NSO), breaking support for all third-party tools. Apps like s3s, nxapi, NSO-RPC and others are currently not working.
+
+Updating authentication credentials **isn’t possible** at the moment, and these services may remain unusable.
+
+**_Do not contact Nintendo about this issue._**
+
+---
+
 *Display your Nintendo Switch game status on Discord!*
 
 This README will be split into two sections:
