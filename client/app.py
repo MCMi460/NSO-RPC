@@ -38,9 +38,11 @@ if not isScriptBundled:
         try:
             import win32com.client
             import winshell
+            import pywintypes
+            import pywintypes
         except:
-            print('Trying to Install required modules: "pypiwin32" and "winshell"\n')
-            os.system(" ".join([sys.executable, "-m pip install pypiwin32 winshell"]))
+            print('Trying to Install required modules: "pypiwin32","pywintypes","winshell"\n')
+            os.system(" ".join([sys.executable, "-m pip install pypiwin32 winshell pywintypes"]))
         from win32com.client import Dispatch
         from winshell import Shortcut
 
@@ -481,7 +483,12 @@ class GUI(Ui_MainWindow):
             raise e
 
         # Set user image
-        client.api.user.image = loadPix(client.api.user.imageUri)
+        if client.api.user and client.api.user.imageUri:
+            client.api.user.image = loadPix(client.api.user.imageUri)
+        else:
+            client.api.user = User()
+            client.api.user.image = QPixmap(getPath('default.png'))
+
         radius = 150
 
         rounded = QPixmap(client.api.user.image.size())
